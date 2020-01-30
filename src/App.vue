@@ -1,15 +1,15 @@
 <template>
   <div id="app">
-    <hello-world></hello-world>
+      <designer></designer>
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld";
+import Designer from "../wxm-crud/Designer";
 export default {
   name: 'app',
   components: {
-      HelloWorld
+      Designer
   }
 }
 </script>
@@ -19,8 +19,7 @@ export default {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+    height: 100%;
 }
 </style>
