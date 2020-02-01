@@ -1,12 +1,5 @@
 <template>
     <div style="height: 100%;" class="wxm-crud-designer">
-        <a-modal okText="确认" cancelText="取消"
-                 :width="800" style="top: 20px;"
-                 title="JSON字符串" @cancel="jsonEditorVisible=false"
-                 @ok="jsonChangeHandler" :visible="jsonEditorVisible">
-            <div style="height: 350px" ref="jsonEditor">
-            </div>
-        </a-modal>
         <a-layout>
             <a-layout-sider :class="'left-sider'" :width="250">
                 <div class="component-list-title">基础字段</div>
@@ -22,6 +15,15 @@
             </a-layout-sider>
             <a-layout-content>
                 <div style="padding:5px 10px 5px 0px;text-align: right;border-bottom: 1px solid #e0e0e0;">
+                    <a-button href="https://github.com/calmatery/crud-frontend" type="link">
+                        GitHub
+                    </a-button>
+                    <a-button href="https://gitee.com/calmatery/crud-frontend" type="link">
+                        Gitee
+                    </a-button>
+                    <a-button @click="previewHandler" type="link">
+                        <a-icon type="eye" /><span style="margin: 0px">预览</span>
+                    </a-button>
                     <a-button @click="value.list=[]" type="link">
                         <i class="icon iconfont icon-trash"></i>清空
                     </a-button>
@@ -35,6 +37,32 @@
                 <designer-item-prop :value="selectedItem"></designer-item-prop>
             </a-layout-sider>
         </a-layout>
+        <a-modal okText="确认" cancelText="取消"
+                 :width="800" style="top: 20px;"
+                 title="JSON字符串" @cancel="jsonEditorVisible=false"
+                 @ok="jsonChangeHandler" :visible="jsonEditorVisible">
+            <div style="height: 350px" ref="jsonEditor">
+            </div>
+        </a-modal>
+        <a-modal @cancel="previewVisible=false"
+                 :width="800" style="top: 20px;"
+                 destroyOnClose="true"
+                 title="预览" :visible="previewVisible">
+            <template slot="footer">
+                <div style="text-align: center">
+                    <a-button @click="getDateHandler"
+                            style="right: 50px" key="submit"
+                            type="primary">
+                        获取数据
+                    </a-button>
+                    <a-button @click="previewVisible=false">取消</a-button>
+                </div>
+            </template>
+
+            <x-from style="height: 400px;overflow: auto"
+                    :value="formVal"
+                    :parameter="value"></x-from>
+        </a-modal>
     </div>
 </template>
 
@@ -44,11 +72,13 @@
     import 'jsoneditor/dist/jsoneditor.css'
     import {basicComponents, layoutComponents} from './componentsConfig.js'
     import Vue from 'vue';
-    import { Button,Layout,Input,Form,DatePicker,Tabs,Modal,message } from 'ant-design-vue';
+    import { Icon, Button,Layout,Input,Form,DatePicker,Tabs,Modal,message } from 'ant-design-vue';
     import draggable from 'vuedraggable'
     import DesignerPanel from "./DesignerPanel";
     import DesignerItemProp from "./DesignerItemProp";
+    import XFrom from "./XFrom";
     Vue.component(Button.name, Button);
+    Vue.component(Icon.name, Icon);
     Vue.component(Input.name, Input);
     Vue.component(DatePicker.name, DatePicker);
     Vue.component(DatePicker.MonthPicker.name, DatePicker.MonthPicker);
@@ -66,7 +96,7 @@
     Vue.component(draggable.name, draggable);
     export default {
         name: "Designer",
-        components: {DesignerItemProp, DesignerPanel},
+        components: {XFrom, DesignerItemProp, DesignerPanel},
         mounted(){
         },
         data(){
@@ -76,18 +106,22 @@
                 value:{
                     list:[]
                 },
+                formVal:null,
                 selectedItem:null,
                 jsonEditor:null,
                 jsonEditorVisible:false,
-                jsonEditorInited:false
+                jsonEditorInited:false,
+                previewVisible:false
             }
         },
         methods:{
-            handleMove (){
-                return true
+            getDateHandler() {
+                console.log(this.formVal)
+                message.info(JSON.stringify(this.formVal));
             },
-            clickHandler() {
-                // console.log(this.value)
+            previewHandler(){
+                this.formVal={}
+                this.previewVisible=true
             },
             jsonChangeHandler(){
                 try{

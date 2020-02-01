@@ -12,7 +12,7 @@
             <designer-form-item :value="value">
                 <a-form-item>
                     <a-date-picker :placeholder="value.placeholder"
-                                   :read-only="true" v-model="value.defaultValue"></a-date-picker>
+                                   v-model="value.defaultValue"></a-date-picker>
                 </a-form-item>
             </designer-form-item>
         </template>
