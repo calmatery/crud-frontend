@@ -1,12 +1,18 @@
 <template>
     <div style="height: 100%;" class="wxm-crud-designer">
-        <a-button @click="clickHandler">打印</a-button>
+        <a-modal okText="确认" cancelText="取消"
+                 :width="800" style="top: 20px;"
+                 title="JSON字符串" @cancel="jsonEditorVisible=false"
+                 @ok="jsonChangeHandler" :visible="jsonEditorVisible">
+            <div style="height: 350px" ref="jsonEditor">
+            </div>
+        </a-modal>
         <a-layout>
             <a-layout-sider :class="'left-sider'" :width="250">
                 <div class="component-list-title">基础字段</div>
                 <div class="component-list-container">
                     <draggable tag="div" :list="basicComponents" :sort="false"
-                               :options="{group:{name: 'designer',pull:'clone'}}" >
+                               :group="{name: 'designer',pull:'clone'}" >
                         <div class="component-icon" v-for="(item, index) in basicComponents" :key="index">
                             <i class="icon iconfont" :class="item._icon"></i>
                             <span>{{item.name}}</span>
@@ -15,6 +21,14 @@
                 </div>
             </a-layout-sider>
             <a-layout-content>
+                <div style="padding:5px 10px 5px 0px;text-align: right;border-bottom: 1px solid #e0e0e0;">
+                    <a-button @click="value.list=[]" type="link">
+                        <i class="icon iconfont icon-trash"></i>清空
+                    </a-button>
+                    <a-button @click="jsonEditorVisible=true" type="link">
+                        <i class="icon iconfont icon-json"></i>JSON序列化
+                    </a-button>
+                </div>
                 <designer-panel @selectedItemChange="(val)=>this.selectedItem=val" :list.sync="value.list"></designer-panel>
             </a-layout-content>
             <a-layout-sider :width="300">
@@ -26,9 +40,11 @@
 
 <script>
     import './icon/iconfont.css'
+    import JSONEditor from 'jsoneditor/dist/jsoneditor.js'
+    import 'jsoneditor/dist/jsoneditor.css'
     import {basicComponents, layoutComponents} from './componentsConfig.js'
     import Vue from 'vue';
-    import { Button,Layout,Input,Form,DatePicker,Tabs } from 'ant-design-vue';
+    import { Button,Layout,Input,Form,DatePicker,Tabs,Modal,message } from 'ant-design-vue';
     import draggable from 'vuedraggable'
     import DesignerPanel from "./DesignerPanel";
     import DesignerItemProp from "./DesignerItemProp";
@@ -37,8 +53,8 @@
     Vue.component(DatePicker.name, DatePicker);
     Vue.component(DatePicker.MonthPicker.name, DatePicker.MonthPicker);
     Vue.component(DatePicker.RangePicker.name, DatePicker.RangePicker);
-    Vue.component(DatePicker.WeekPicker.name, DatePicker.WeekPicker);
     Vue.component(Tabs.name, Tabs);
+    Vue.component(Modal.name, Modal);
     Vue.component(Tabs.TabPane.name, Tabs.TabPane);
     Vue.component(Form.name, Form);
     Vue.component(Form.Item.name, Form.Item);
@@ -51,6 +67,8 @@
     export default {
         name: "Designer",
         components: {DesignerItemProp, DesignerPanel},
+        mounted(){
+        },
         data(){
             return{
                 basicComponents,
@@ -58,7 +76,10 @@
                 value:{
                     list:[]
                 },
-                selectedItem:null
+                selectedItem:null,
+                jsonEditor:null,
+                jsonEditorVisible:false,
+                jsonEditorInited:false
             }
         },
         methods:{
@@ -66,7 +87,17 @@
                 return true
             },
             clickHandler() {
-                console.log(this.value)
+                // console.log(this.value)
+            },
+            jsonChangeHandler(){
+                try{
+                    this.value = this.jsonEditor.get()
+                    this.jsonEditorVisible=false
+                }
+                catch(err){
+                    console.error(err)
+                    message.error('JSON格式异常！');
+                }
             }
         },
         watch:{
@@ -74,6 +105,24 @@
                 handler () {
                 },
                 deep: true
+            },
+            jsonEditorVisible(val){
+                if(val){
+                    this.$nextTick(function(){
+                        if(!this.jsonEditorInited){
+                            let options = {
+                                mode: "code",
+                                mainMenuBar:false,
+                                statusBar:false
+                            };
+                            this.jsonEditor = new JSONEditor(this.$refs.jsonEditor,options,this.value)
+                            this.jsonEditorInited = true
+                        }
+                        else{
+                            this.jsonEditor.set(this.value)
+                        }
+                    })
+                }
             }
         }
     }

@@ -10,6 +10,7 @@
   "dependencies": {
     "ant-design-vue": "^1.4.10",
     "core-js": "^2.6.5",
+    "jsoneditor": "^8.4.1",
     "vue": "^2.6.10",
     "vuedraggable": "^2.23.2"
   },
@@ -33,7 +34,7 @@
       "eslint:recommended"
     ],
     "rules": {
-      "no-console":"off"
+      "no-console": "off"
     },
     "parserOptions": {
       "parser": "babel-eslint"

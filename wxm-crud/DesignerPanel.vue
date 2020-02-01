@@ -4,18 +4,18 @@
             <draggable :style="'height:500px'" group="designer" handle=".component-drag"
                        ghostClass="dragging"
                    v-model="itemList" @add="itemAdd">
-                <i-designer-item @itemDel="itemDel" v-for="item in itemList" :key="item.key"
-                                 :value="item" :selected.sync="selectedItem"></i-designer-item>
+                <designer-item @itemDel="itemDel" v-for="item in itemList" :key="item.key"
+                                 :value="item" :selected.sync="selectedItem"></designer-item>
             </draggable>
         </a-form>
     </div>
 </template>
 
 <script>
-    import IDesignerItem from "./IDesignerItem";
+    import DesignerItem from "./DesignerItem";
     export default {
         name: "DesignerPanel",
-        components: {IDesignerItem},
+        components: {DesignerItem},
         props: ["list"],
         created() {
         },

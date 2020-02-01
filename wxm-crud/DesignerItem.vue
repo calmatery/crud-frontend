@@ -29,7 +29,7 @@
     import AFormItem from "ant-design-vue/es/form/FormItem";
     import DesignerFormItem from "./DesignerFormItem";
     export default {
-        name: "IDesignerItem",
+        name: "DesignerItem",
         components: {DesignerFormItem, AFormItem},
         props:["value",'selected'],
         data(){
