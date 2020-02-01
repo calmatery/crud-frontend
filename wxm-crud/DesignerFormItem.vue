@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="left-container" style="width: 100px">
-            1231
+            {{value.name}}
         </div>
         <div style="margin-left: 100px">
             <slot></slot>
@@ -11,7 +11,8 @@
 
 <script>
     export default {
-        name: "DesignerFormItem"
+        name: "DesignerFormItem",
+        props:['value']
     }
 </script>
 

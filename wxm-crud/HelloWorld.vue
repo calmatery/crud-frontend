@@ -1,32 +1,41 @@
 <template>
-  <div class="hello">
-    <a-button type="primary">Button></a-button>
-  </div>
+  <a-form :form="form" @submit="handleSubmit">
+    <a-form-item label="Note" :label-col="{ span: 5 }" :wrapper-col="{ span: 12 }">
+      <a-input
+              v-decorator="['note', { rules: [{ required: true, message: 'Please input your note!' }] }]"
+      />
+    </a-form-item>
+    <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
+      <a-button type="primary" html-type="submit">
+        Submit
+      </a-button>
+    </a-form-item>
+  </a-form>
 </template>
 
 <script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
+    export default {
+        data() {
+            return {
+                formLayout: 'horizontal',
+                form: this.$form.createForm(this, { name: 'coordinated' }),
+            };
+        },
+        methods: {
+            handleSubmit(e) {
+                e.preventDefault();
+                this.form.validateFields((err, values) => {
+                    if (!err) {
+                        console.log('Received values of form: ', values);
+                    }
+                });
+            },
+            handleSelectChange(value) {
+                console.log(value);
+                this.form.setFieldsValue({
+                    note: `Hi, ${value === 'male' ? 'man' : 'lady'}!`,
+                });
+            },
+        },
+    };
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>

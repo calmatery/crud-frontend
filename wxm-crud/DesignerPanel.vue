@@ -1,11 +1,11 @@
 <template>
     <div class="designerPanel">
-        <a-form>
+        <a-form :form="form" @submit="testHandler">
             <draggable :style="'height:500px'" group="designer" handle=".component-drag"
                        ghostClass="dragging"
                    v-model="itemList" @add="itemAdd">
-                <i-designer-item v-for="item in itemList" :key="item.key"
-                                 :value="item" :selected.sync="selected"></i-designer-item>
+                <i-designer-item @itemDel="itemDel" v-for="item in itemList" :key="item.key"
+                                 :value="item" :selected.sync="selectedItem"></i-designer-item>
             </draggable>
         </a-form>
     </div>
@@ -22,14 +22,41 @@
         data() {
             return {
                 itemList: this.list,
-                selected: null
+                selectedItem: null,
+                form:this.$form.createForm(this, { name: 'dynamic_rule' }),
             }
         },
         methods: {
             itemAdd(evt) {
-                console.log(111111122)
-                console.log(this)
-                console.log(evt)
+                let itemValue = {...this.itemList[evt.newIndex]}
+                Object.keys(itemValue).map((key)=>{
+                    if(key.substr(0,1)=="_"){
+                        delete itemValue[key]
+                    }
+                })
+                itemValue.key = itemValue.type+"_"+new Date().getTime()+"_"+Math.ceil(Math.random() * 99999)
+                this.$set(this.itemList,evt.newIndex,itemValue)
+            },
+            itemDel(item){
+                let idx = this.itemList.indexOf(item);
+                if(idx>=0){
+                    this.itemList.splice(idx,1)
+                    if(this.itemList.length>0){
+                        this.selectedItem=this.itemList[idx==0?0:idx-1]
+                    }
+                    else {
+                        this.selectedItem = null
+                    }
+                }
+            },
+            testHandler(e){
+                e.preventDefault();
+                this.form.validateFields((err,fieldsValue)=>{
+                    if (err) {
+                        return
+                    }
+                    console.log(fieldsValue)
+                })
             }
         },
         watch: {
@@ -41,6 +68,9 @@
             },
             list(val) {
                 this.itemList = val
+            },
+            selectedItem(val) {
+                this.$emit('selectedItemChange', val)
             }
         }
     }

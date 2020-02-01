@@ -2,20 +2,22 @@ export const basicComponents = [
     {
         type: 'input',
         name: '输入框',
-        icon: 'icon-textarea'
+        _icon: 'icon-textarea',
+        defaultValue: '',
+        placeholder: '',
     },
     {
-        type: 'input',
-        name: '多行文本',
-        icon: 'icon-fuhao-shuzishurukuang'
+        type: 'datePicker',
+        name: '日期选择',
+        _icon: 'icon-fuhao-shuzishurukuang',
+        placeholder:''
     },
     {
         type: 'input',
         name: '测试',
-        icon: 'icon-fuhao-shuzishurukuang'
+        _icon: 'icon-fuhao-shuzishurukuang'
     }
 ]
-
 
 export const layoutComponents = [
     {}

@@ -1,6 +1,6 @@
 <template>
     <div style="height: 100%;" class="wxm-crud-designer">
-        <!--<a-button @click="clickHandler">123</a-button>-->
+        <a-button @click="clickHandler">打印</a-button>
         <a-layout>
             <a-layout-sider :class="'left-sider'" :width="250">
                 <div class="component-list-title">基础字段</div>
@@ -8,16 +8,18 @@
                     <draggable tag="div" :list="basicComponents" :sort="false"
                                :options="{group:{name: 'designer',pull:'clone'}}" >
                         <div class="component-icon" v-for="(item, index) in basicComponents" :key="index">
-                            <i class="icon iconfont" :class="item.icon"></i>
+                            <i class="icon iconfont" :class="item._icon"></i>
                             <span>{{item.name}}</span>
                         </div>
                     </draggable>
                 </div>
             </a-layout-sider>
             <a-layout-content>
-                <designer-panel :list.sync="value.list"></designer-panel>
+                <designer-panel @selectedItemChange="(val)=>this.selectedItem=val" :list.sync="value.list"></designer-panel>
             </a-layout-content>
-            <a-layout-sider :width="300"></a-layout-sider>
+            <a-layout-sider :width="300">
+                <designer-item-prop :value="selectedItem"></designer-item-prop>
+            </a-layout-sider>
         </a-layout>
     </div>
 </template>
@@ -26,11 +28,18 @@
     import './icon/iconfont.css'
     import {basicComponents, layoutComponents} from './componentsConfig.js'
     import Vue from 'vue';
-    import { Button,Layout,Input,Form } from 'ant-design-vue';
+    import { Button,Layout,Input,Form,DatePicker,Tabs } from 'ant-design-vue';
     import draggable from 'vuedraggable'
     import DesignerPanel from "./DesignerPanel";
+    import DesignerItemProp from "./DesignerItemProp";
     Vue.component(Button.name, Button);
     Vue.component(Input.name, Input);
+    Vue.component(DatePicker.name, DatePicker);
+    Vue.component(DatePicker.MonthPicker.name, DatePicker.MonthPicker);
+    Vue.component(DatePicker.RangePicker.name, DatePicker.RangePicker);
+    Vue.component(DatePicker.WeekPicker.name, DatePicker.WeekPicker);
+    Vue.component(Tabs.name, Tabs);
+    Vue.component(Tabs.TabPane.name, Tabs.TabPane);
     Vue.component(Form.name, Form);
     Vue.component(Form.Item.name, Form.Item);
     Vue.component(Layout.name, Layout);
@@ -41,14 +50,15 @@
     Vue.component(draggable.name, draggable);
     export default {
         name: "Designer",
-        components: {DesignerPanel},
+        components: {DesignerItemProp, DesignerPanel},
         data(){
             return{
                 basicComponents,
                 layoutComponents,
                 value:{
                     list:[]
-                }
+                },
+                selectedItem:null
             }
         },
         methods:{
@@ -61,9 +71,7 @@
         },
         watch:{
             value:{
-                handler (val) {
-                    console.log(1111)
-                    console.log(val)
+                handler () {
                 },
                 deep: true
             }

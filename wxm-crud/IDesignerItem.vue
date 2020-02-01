@@ -1,15 +1,27 @@
 <template>
-    <div :class="selectedItem!==self?'item':'item-selected'" @click="clickHandler">
+    <div :class="selectedItem!==value?'item':'item-selected'" @click="clickHandler">
         <template v-if="value.type=='input'">
-            <designer-form-item>
+            <designer-form-item :value="value">
                 <a-form-item>
-                    <a-input></a-input>
+                    <a-input :placeholder="value.placeholder"
+                             :read-only="true" v-model="value.defaultValue"></a-input>
                 </a-form-item>
             </designer-form-item>
-            <div class="component-drag" v-if="selectedItem==self">
-                <i class="iconfont icon-drag"></i>
-            </div>
         </template>
+        <template v-if="value.type=='datePicker'">
+            <designer-form-item :value="value">
+                <a-form-item>
+                    <a-date-picker :placeholder="value.placeholder"
+                                   :read-only="true" v-model="value.defaultValue"></a-date-picker>
+                </a-form-item>
+            </designer-form-item>
+        </template>
+        <div class="component-drag" v-if="selectedItem==value">
+            <i class="iconfont icon-drag"></i>
+        </div>
+        <div @click="()=>this.$emit('itemDel',this.value)" class="component-del" v-if="selectedItem==value">
+            <i class="iconfont icon-trash"></i>
+        </div>
     </div>
 </template>
 
@@ -23,14 +35,13 @@
         data(){
             return{
                 selectedItem : this.selected,
-                self : this
+                self : this,
+                key: this.value.key
             }
         },
         methods:{
             clickHandler(){
-                this.selectedItem = this;
-                console.log(this)
-                console.log(123123)
+                this.selectedItem = this.value;
             }
         },
         watch:{
@@ -47,6 +58,17 @@
 </script>
 
 <style scoped>
+    .component-del{
+        position: absolute;
+        background-color: #1890FF;
+        color: #FFF;
+        width: 24px;
+        text-align: center;
+        right: 0px;
+        bottom: 0px;
+        cursor: pointer;
+    }
+
     .component-drag{
         position: absolute;
         left: -1px;
@@ -55,6 +77,7 @@
         color: #FFF;
         width: 24px;
         text-align: center;
+        cursor: move;
     }
     .item, .item-selected{
         position: relative;
@@ -62,14 +85,14 @@
         margin-top: 4px
     }
     .item:hover{
-        outline:2px solid #1890FF;
+        border:1px solid #1890FF;
     }
     .item{
         border:1px dashed #aaaaaa;
     }
     .item-selected{
         outline:2px solid #1890FF;
-        border:1px dashed #1890FF;
+        border:1px solid #1890FF;
     }
 
 </style>
