@@ -30,6 +30,30 @@
             </a-row>
         </template>
 
+        <template v-if="value.type=='tabs'">
+            <a-tabs :default-active-key="0">
+                <a-tab-pane v-for="(tab,i) in value.tabs" :tab="tab.name" :key="i">
+                    <div style="margin:2px 1px;
+                        border:1px dashed #aaaaaa;background-color: #FFF">
+                        <designer-panel
+                                :selected.sync="selectedItem"
+                                :list.sync="tab.list"></designer-panel>
+                    </div>
+                </a-tab-pane>
+            </a-tabs>
+        </template>
+
+        <template v-if="value.type=='divider'">
+            <template v-if="value.orientation=='center'">
+                <a-divider :dashed="value.dashed" v-if="value.name">{{value.name}}</a-divider>
+                <a-divider :dashed="value.dashed" v-else></a-divider>
+            </template>
+            <template v-else>
+                <a-divider :orientation="value.orientation" :dashed="value.dashed" v-if="value.name">{{value.name}}</a-divider>
+                <a-divider :orientation="value.orientation" :dashed="value.dashed" v-else></a-divider>
+            </template>
+        </template>
+
         <div class="component-drag" v-if="selectedItem==value">
             <i class="iconfont icon-drag"></i>
         </div>

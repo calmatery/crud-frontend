@@ -9,11 +9,18 @@
                                      label="标识">
                             <a-input v-model="value.key"></a-input>
                         </a-form-item>
-                        <a-form-item :validate-status="value.name&&value.name.trim()?'success':'error'"
+
+
+                        <a-form-item v-if="value.type=='divider'"
+                                     label="标题">
+                            <a-input v-model="value.name"></a-input>
+                        </a-form-item>
+                        <a-form-item v-else :validate-status="value.name&&value.name.trim()?'success':'error'"
                                      :help="value.name&&value.name.trim()?'':'内容不能为空！'"
                                      label="标题">
                             <a-input v-model="value.name"></a-input>
                         </a-form-item>
+
                         <a-form-item v-if="['input'].indexOf(value.type)>=0" label="默认值">
                             <a-input v-model="value.defaultValue"></a-input>
                         </a-form-item>
@@ -46,6 +53,42 @@
                             <a-button type="link" style="margin: 10px;"
                                       @click="value.cols.push({span:12,list:[]})">添加列</a-button>
                         </a-form-item>
+                        <a-form-item v-if="value.type=='tabs'" label="标签页配置">
+                            <draggable handle=".drag"
+                                       ghostClass="dragging"
+                                       v-model="value.tabs">
+                                <div v-for="(tab,i) in value.tabs" :key="i" :style="i>0?'margin-top: 10px;':''">
+                                    <div style="display: inline-block;vertical-align: middle;">
+                                        <i class="drag icon iconfont icon-yidongdaohang"
+                                           style="font-size: 20px;margin-top:3px;color:#9c9c9c;cursor:move;"></i>
+                                    </div>
+                                    <div style="display: inline-block;width: calc(100% - 50px);margin: 0 5px;">
+                                        <a-input style="width: 100%;" v-model="tab.name"></a-input>
+                                    </div>
+                                    <div style="display: inline-block;vertical-align: middle;">
+                                        <i class="icon iconfont icon-shanchu" v-if="value.tabs.length>1"
+                                           @click="value.tabs.splice(i,1)"
+                                           style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
+                                    </div>
+                                </div>
+                            </draggable>
+                            <a-button type="link" style="margin: 10px;"
+                                      @click="value.tabs.push({name:'新标签页',list:[]})">添加列</a-button>
+                        </a-form-item>
+
+                        <a-form-item v-if="value.type=='divider'"
+                                     label="是否虚线">
+                            <a-checkbox v-model="value.dashed">是</a-checkbox>
+                        </a-form-item>
+                        <a-form-item v-if="value.type=='divider'"
+                                     label="位置">
+                            <a-select defaultValue="left" v-model="value.orientation">
+                                <a-select-option value="left">左</a-select-option>
+                                <a-select-option value="center">中</a-select-option>
+                                <a-select-option value="right">右</a-select-option>
+                            </a-select>
+                        </a-form-item>
+
                     </a-form>
                 </div>
             </a-tab-pane>

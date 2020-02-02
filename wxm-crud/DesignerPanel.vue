@@ -35,6 +35,13 @@
                     })
                     itemValue.cols = cols
                 }
+                if(itemValue.type=='tabs'){
+                    let tabs =[]
+                    itemValue.tabs.forEach(function(tab){
+                        tabs.push({...tab})
+                    })
+                    itemValue.tabs = tabs
+                }
                 Object.keys(itemValue).map((key)=>{
                     if(key.substr(0,1)=="_"){
                         delete itemValue[key]

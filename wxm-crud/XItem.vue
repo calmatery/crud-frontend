@@ -27,6 +27,28 @@
             </a-row>
         </template>
 
+        <template v-if="parameter.type=='tabs'">
+            <a-tabs :default-active-key="0">
+                <a-tab-pane v-for="(tab,i) in parameter.tabs" :key="i" :tab="tab.name">
+                    <x-from style="overflow: auto" :value="value"
+                            :parameter="tab.list"></x-from>
+                </a-tab-pane>
+            </a-tabs>
+        </template>
+
+        <template v-if="parameter.type=='divider'">
+            <template v-if="parameter.orientation=='center'">
+                <a-divider :dashed="parameter.dashed"
+                           v-if="parameter.name">{{parameter.name}}</a-divider>
+                <a-divider :dashed="parameter.dashed" v-else></a-divider>
+            </template>
+            <template v-else>
+                <a-divider :orientation="parameter.orientation"
+                           :dashed="parameter.dashed" v-if="parameter.name">{{parameter.name}}</a-divider>
+                <a-divider :orientation="parameter.orientation" :dashed="parameter.dashed" v-else></a-divider>
+            </template>
+        </template>
+
     </div>
 </template>
 

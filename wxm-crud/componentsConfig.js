@@ -34,5 +34,23 @@ export const layoutComponents = [
                 list:[]
             }
         ]
+    },
+    {
+        type: 'tabs',
+        name: '标签页',
+        _icon: 'icon-tabs',
+        tabs:[
+            {
+                name:'新标签页',
+                list:[]
+            }
+        ]
+    },
+    {
+        type: 'divider',
+        name: '分割线',
+        _icon: 'icon-fengexian',
+        orientation:'left',
+        dashed:false
     }
 ]
