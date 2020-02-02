@@ -1,5 +1,5 @@
 <template>
-    <div :class="selectedItem!==value?'item':'item-selected'" @click="clickHandler">
+    <div :class="selectedItem!==value?'item':'item-selected'" @click.stop="clickHandler">
         <template v-if="value.type=='input'">
             <designer-form-item :value="value">
                 <a-form-item>
@@ -16,6 +16,20 @@
                 </a-form-item>
             </designer-form-item>
         </template>
+
+        <template v-if="value.type=='grid'">
+            <a-row :style="'background-color: #F9CD9E'">
+                <a-col v-for="(col,i) in value.cols" :span="col.span" :key="i">
+                    <div style="margin:2px 1px;
+                        border:1px dashed #aaaaaa;background-color: #FFF">
+                        <designer-panel
+                                        :selected.sync="selectedItem"
+                                        :list.sync="col.list"></designer-panel>
+                    </div>
+                </a-col>
+            </a-row>
+        </template>
+
         <div class="component-drag" v-if="selectedItem==value">
             <i class="iconfont icon-drag"></i>
         </div>
@@ -45,10 +59,8 @@
             }
         },
         watch:{
-            selectedItem: {
-                handler(val) {
-                    this.$emit('update:selected', val)
-                }
+            selectedItem(val) {
+                this.$emit('update:selected', val)
             },
             selected(val) {
                 this.selectedItem = val

@@ -24,7 +24,28 @@
                         <a-form-item v-if="['input','datePicker'].indexOf(value.type)>=0" label="占位内容">
                             <a-input v-model="value.placeholder"></a-input>
                         </a-form-item>
-
+                        <a-form-item v-if="value.type=='grid'" label="列配置">
+                            <draggable handle=".drag"
+                                       ghostClass="dragging"
+                                       v-model="value.cols">
+                                <div v-for="(col,i) in value.cols" :key="i" :style="i>0?'margin-top: 10px;':''">
+                                    <div style="display: inline-block;vertical-align: middle;">
+                                        <i class="drag icon iconfont icon-yidongdaohang"
+                                           style="font-size: 20px;margin-top:3px;color:#9c9c9c;cursor:move;"></i>
+                                    </div>
+                                    <div style="display: inline-block;width: calc(100% - 50px);margin: 0 5px;">
+                                        <a-input-number style="width: 100%;" v-model="col.span"></a-input-number>
+                                    </div>
+                                    <div style="display: inline-block;vertical-align: middle;">
+                                        <i class="icon iconfont icon-shanchu"
+                                           @click="value.cols.splice(i,1)"
+                                           style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
+                                    </div>
+                                </div>
+                            </draggable>
+                            <a-button type="link" style="margin: 10px;"
+                                      @click="value.cols.push({span:12,list:[]})">添加列</a-button>
+                        </a-form-item>
                     </a-form>
                 </div>
             </a-tab-pane>
@@ -64,5 +85,9 @@
 </script>
 
 <style scoped>
-
+    .dragging{
+        border: 2px solid red;
+        width: 100%;
+        height: 0px;
+    }
 </style>

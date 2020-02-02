@@ -12,6 +12,16 @@
                         </div>
                     </draggable>
                 </div>
+                <div class="component-list-title">布局字段</div>
+                <div class="component-list-container">
+                    <draggable tag="div" :list="layoutComponents" :sort="false"
+                               :group="{name: 'designer',pull:'clone'}" >
+                        <div class="component-icon" v-for="(item, index) in layoutComponents" :key="index">
+                            <i class="icon iconfont" :class="item._icon"></i>
+                            <span>{{item.name}}</span>
+                        </div>
+                    </draggable>
+                </div>
             </a-layout-sider>
             <a-layout-content>
                 <div style="padding:5px 10px 5px 0px;text-align: right;border-bottom: 1px solid #e0e0e0;">
@@ -22,7 +32,7 @@
                         Gitee
                     </a-button>
                     <a-button @click="previewHandler" type="link">
-                        <a-icon type="eye" /><span style="margin: 0px">预览</span>
+                        <i class="icon iconfont icon-preview"></i>预览
                     </a-button>
                     <a-button @click="value.list=[]" type="link">
                         <i class="icon iconfont icon-trash"></i>清空
@@ -31,7 +41,7 @@
                         <i class="icon iconfont icon-json"></i>JSON序列化
                     </a-button>
                 </div>
-                <designer-panel @selectedItemChange="(val)=>this.selectedItem=val" :list.sync="value.list"></designer-panel>
+                <designer-panel :selected.sync="selectedItem" :list.sync="value.list"></designer-panel>
             </a-layout-content>
             <a-layout-sider :width="300">
                 <designer-item-prop :value="selectedItem"></designer-item-prop>
@@ -46,7 +56,7 @@
         </a-modal>
         <a-modal @cancel="previewVisible=false"
                  :width="800" style="top: 20px;"
-                 destroyOnClose="true"
+                 :destroyOnClose="true"
                  title="预览" :visible="previewVisible">
             <template slot="footer">
                 <div style="text-align: center">
@@ -72,19 +82,26 @@
     import 'jsoneditor/dist/jsoneditor.css'
     import {basicComponents, layoutComponents} from './componentsConfig.js'
     import Vue from 'vue';
-    import { Icon, Button,Layout,Input,Form,DatePicker,Tabs,Modal,message } from 'ant-design-vue';
+    import { Icon, Button,Layout,Input,InputNumber,Form,DatePicker,
+        Tabs,Modal,Row,Col,
+        message } from 'ant-design-vue';
     import draggable from 'vuedraggable'
     import DesignerPanel from "./DesignerPanel";
     import DesignerItemProp from "./DesignerItemProp";
+    import DesignerItem from "./DesignerItem";
     import XFrom from "./XFrom";
+    import XItem from "./XItem";
     Vue.component(Button.name, Button);
     Vue.component(Icon.name, Icon);
     Vue.component(Input.name, Input);
+    Vue.component(InputNumber.name, InputNumber);
     Vue.component(DatePicker.name, DatePicker);
     Vue.component(DatePicker.MonthPicker.name, DatePicker.MonthPicker);
     Vue.component(DatePicker.RangePicker.name, DatePicker.RangePicker);
     Vue.component(Tabs.name, Tabs);
     Vue.component(Modal.name, Modal);
+    Vue.component(Row.name, Row);
+    Vue.component(Col.name, Col);
     Vue.component(Tabs.TabPane.name, Tabs.TabPane);
     Vue.component(Form.name, Form);
     Vue.component(Form.Item.name, Form.Item);
@@ -94,9 +111,16 @@
     Vue.component(Layout.Sider.name, Layout.Sider);
     Vue.component(Layout.Footer.name, Layout.Footer);
     Vue.component(draggable.name, draggable);
+    Vue.component(DesignerPanel.name,DesignerPanel)
+    Vue.component(DesignerItem.name,DesignerItem)
+    Vue.component(XFrom.name,XFrom)
+    Vue.component(XItem.name,XItem)
     export default {
         name: "Designer",
-        components: {XFrom, DesignerItemProp, DesignerPanel},
+        components: {DesignerItemProp, DesignerPanel},
+        created(){
+
+        },
         mounted(){
         },
         data(){
@@ -106,7 +130,7 @@
                 value:{
                     list:[]
                 },
-                formVal:null,
+                formVal:{},
                 selectedItem:null,
                 jsonEditor:null,
                 jsonEditorVisible:false,
@@ -120,7 +144,7 @@
                 message.info(JSON.stringify(this.formVal));
             },
             previewHandler(){
-                this.formVal={}
+                this.formVal={key1:111}
                 this.previewVisible=true
             },
             jsonChangeHandler(){
@@ -139,6 +163,9 @@
                 handler () {
                 },
                 deep: true
+            },
+            'formVal.text1'(val){
+                console.log('formVal.text1发送变化了:'+val)
             },
             jsonEditorVisible(val){
                 if(val){
@@ -185,6 +212,7 @@
 
     .wxm-crud-designer .left-sider .component-list-container{
         padding: 0 12px 12px;
+        overflow: hidden;
     }
     .wxm-crud-designer .component-icon{
         cursor: move;

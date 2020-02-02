@@ -20,5 +20,19 @@ export const basicComponents = [
 ]
 
 export const layoutComponents = [
-    {}
+    {
+        type: 'grid',
+        name: '栅格',
+        _icon: 'icon-rectangle_grid_x_fill',
+        cols:[
+            {
+                span:12,
+                list:[]
+            },
+            {
+                span:12,
+                list:[]
+            }
+        ]
+    }
 ]

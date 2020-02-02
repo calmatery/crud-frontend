@@ -1,7 +1,7 @@
 <template>
     <div class="designerPanel">
         <a-form :form="form" @submit="testHandler">
-            <draggable :style="'height:500px'" group="designer" handle=".component-drag"
+            <draggable :style="'min-height:50px'" group="designer" handle=".component-drag"
                        ghostClass="dragging"
                    v-model="itemList" @add="itemAdd">
                 <designer-item @itemDel="itemDel" v-for="item in itemList" :key="item.key"
@@ -12,23 +12,29 @@
 </template>
 
 <script>
-    import DesignerItem from "./DesignerItem";
     export default {
         name: "DesignerPanel",
-        components: {DesignerItem},
-        props: ["list"],
+        props: ["list",'selected'],
         created() {
+            // this.selectedItem = this.selected;
         },
         data() {
             return {
+                selectedItem : this.selected,
                 itemList: this.list,
-                selectedItem: null,
                 form:this.$form.createForm(this, { name: 'dynamic_rule' }),
             }
         },
         methods: {
             itemAdd(evt) {
                 let itemValue = {...this.itemList[evt.newIndex]}
+                if(itemValue.type=='grid'){
+                    let cols =[]
+                    itemValue.cols.forEach(function(col){
+                        cols.push({...col})
+                    })
+                    itemValue.cols = cols
+                }
                 Object.keys(itemValue).map((key)=>{
                     if(key.substr(0,1)=="_"){
                         delete itemValue[key]
@@ -70,7 +76,10 @@
                 this.itemList = val
             },
             selectedItem(val) {
-                this.$emit('selectedItemChange', val)
+                this.$emit('update:selected', val)
+            },
+            selected(val){
+                this.selectedItem=val
             }
         }
     }
@@ -78,7 +87,7 @@
 
 <style>
     .wxm-crud-designer .designerPanel{
-        padding: 0px 4px;
+        padding: 0px 4px 10px 4px;
     }
     .wxm-crud-designer .designerPanel .component-icon,
     .wxm-crud-designer .designerPanel .dragging,
