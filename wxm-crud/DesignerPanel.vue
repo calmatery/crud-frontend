@@ -1,6 +1,6 @@
 <template>
     <div class="designerPanel">
-        <a-form :form="form" @submit="testHandler">
+        <a-form :form="form">
             <draggable :style="'min-height:50px'" group="designer" handle=".component-drag"
                        ghostClass="dragging"
                    v-model="itemList" @add="itemAdd">
@@ -28,7 +28,7 @@
         methods: {
             itemAdd(evt) {
                 let itemValue = {...this.itemList[evt.newIndex]}
-                if(itemValue.type=='grid'){
+                if(itemValue.type=='grid'||itemValue.type=='table'){
                     let cols =[]
                     itemValue.cols.forEach(function(col){
                         cols.push({...col})
@@ -42,12 +42,21 @@
                     })
                     itemValue.tabs = tabs
                 }
+
+                if(itemValue.type=='table'){
+                    let scopeListeners =[]
+                    itemValue.scopeListeners.forEach(function(scopeListener){
+                        scopeListeners.push({...scopeListener})
+                    })
+                    itemValue.scopeListeners = scopeListeners
+                }
+
                 Object.keys(itemValue).map((key)=>{
                     if(key.substr(0,1)=="_"){
                         delete itemValue[key]
                     }
                 })
-                itemValue.key = itemValue.type+"_"+new Date().getTime()+"_"+Math.ceil(Math.random() * 99999)
+                itemValue.key = itemValue.key||(itemValue.type+"_"+new Date().getTime()+"_"+Math.ceil(Math.random() * 99999))
                 this.$set(this.itemList,evt.newIndex,itemValue)
             },
             itemDel(item){
@@ -61,15 +70,6 @@
                         this.selectedItem = null
                     }
                 }
-            },
-            testHandler(e){
-                e.preventDefault();
-                this.form.validateFields((err,fieldsValue)=>{
-                    if (err) {
-                        return
-                    }
-                    console.log(fieldsValue)
-                })
             }
         },
         watch: {

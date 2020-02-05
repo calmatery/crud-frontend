@@ -1,5 +1,11 @@
 export const basicComponents = [
     {
+        type: 'button',
+        name: '按钮',
+        _icon: 'icon-anniu',
+        btnType:'primary'
+    },
+    {
         type: 'input',
         name: '输入框',
         _icon: 'icon-textarea',
@@ -13,9 +19,20 @@ export const basicComponents = [
         placeholder:''
     },
     {
-        type: 'input',
-        name: '测试',
-        _icon: 'icon-fuhao-shuzishurukuang'
+        type: 'table',
+        name: '报表',
+        _icon: 'icon-biaoge',
+        cols: [
+            {
+                title: "列1",
+                dataIndex: "col1"
+            },
+            {
+                title: "列2",
+                dataIndex: "col2"
+            }
+        ],
+        scopeListeners:[]
     }
 ]
 
@@ -52,5 +69,11 @@ export const layoutComponents = [
         _icon: 'icon-fengexian',
         orientation:'left',
         dashed:false
+    },
+    {
+        type: 'scopeGateway',
+        name: '作用域网关',
+        _icon: 'icon-wangguan',
+        list:[]
     }
 ]

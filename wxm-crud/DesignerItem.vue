@@ -1,5 +1,9 @@
 <template>
     <div :class="selectedItem!==value?'item':'item-selected'" @click.stop="clickHandler">
+        <!--基础字段-->
+        <template v-if="value.type=='button'">
+                    <a-button :type="value.btnType">{{value.name}}</a-button>
+        </template>
         <template v-if="value.type=='input'">
             <designer-form-item :value="value">
                 <a-form-item>
@@ -17,6 +21,13 @@
             </designer-form-item>
         </template>
 
+        <template v-if="value.type=='table'">
+            <a-table :columns="value.cols" bordered>
+            </a-table>
+        </template>
+
+
+        <!--布局字段-->
         <template v-if="value.type=='grid'">
             <a-row :style="'background-color: #F9CD9E'">
                 <a-col v-for="(col,i) in value.cols" :span="col.span" :key="i">
@@ -54,10 +65,18 @@
             </template>
         </template>
 
-        <div class="component-drag" v-if="selectedItem==value">
+        <template v-if="value.type=='scopeGateway'">
+            <div style="margin: 1px;">
+                <designer-panel :selected.sync="selectedItem"
+                                :list.sync="value.list"></designer-panel>
+            </div>
+        </template>
+
+        <div class="component-drag" v-if="selectedItem==value" style="z-index:999">
             <i class="iconfont icon-drag"></i>
         </div>
-        <div @click="()=>this.$emit('itemDel',this.value)" class="component-del" v-if="selectedItem==value">
+        <div @click="()=>this.$emit('itemDel',this.value)"
+             class="component-del" v-if="selectedItem==value" style="z-index:999">
             <i class="iconfont icon-trash"></i>
         </div>
     </div>

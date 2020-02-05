@@ -89,6 +89,101 @@
                             </a-select>
                         </a-form-item>
 
+                        <a-form-item v-if="value.type=='table'" label="列配置">
+                            <draggable handle=".drag"
+                                       ghostClass="dragging"
+                                       v-model="value.cols">
+                                <div v-for="(col,i) in value.cols" :key="i" :style="i>0?'margin-top: 10px;':''">
+                                    <div style="display: inline-block;vertical-align: middle;">
+                                        <i class="drag icon iconfont icon-yidongdaohang"
+                                           style="font-size: 20px;margin-top:3px;color:#9c9c9c;cursor:move;"></i>
+                                    </div>
+                                    <div style="text-align: right;display: inline-block;width: 50px;margin: 0 5px;">
+                                        名称
+                                    </div>
+                                    <div style="display: inline-block;width: calc(100% - 130px);margin: 0 5px;">
+                                        <a-input style="width: 100%;" v-model="col.title"></a-input>
+                                    </div>
+                                    <div style="display: inline-block;vertical-align: middle;">
+                                        <i class="icon iconfont icon-shanchu"
+                                           @click="value.cols.splice(i,1)"
+                                           style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
+                                    </div>
+                                    <div style="display: inline-block;vertical-align: middle;">
+                                        <i v-if="tableColOpened==i" class="icon iconfont icon-xiangshangshouqi-yuankuang"
+                                           @click="tableColOpened=-1"
+                                           style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
+                                        <i v-else class="icon iconfont icon-xiangxiazhankai-yuankuang"
+                                           @click="tableColOpened=i"
+                                           style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
+                                    </div>
+                                    <div v-if="tableColOpened==i">
+                                        <div style="text-align: right;display: inline-block;width: 70px;margin: 0 5px;">
+                                            数据标识
+                                        </div>
+                                        <div style="display: inline-block;width: calc(100% - 130px);margin: 0 5px;">
+                                            <a-input style="width: 100%;" v-model="col.dataIndex"></a-input>
+                                        </div>
+                                    </div>
+                                </div>
+                            </draggable>
+                            <a-button type="link" style="margin: 10px;"
+                                      @click="value.cols.push(
+                                      {
+                                        title:'',
+                                        dataIndex:''
+                                      })">添加列</a-button>
+                        </a-form-item>
+
+                        <a-form-item v-if="value.type=='table'" label="作用域消息监听">
+                            <draggable handle=".drag"
+                                       ghostClass="dragging"
+                                       v-model="value.cols">
+                                <div v-for="(scopeListener,i) in value.scopeListeners"
+                                     :key="i" :style="i>0?'margin-top: 10px;':''">
+                                    <div style="overflow: hidden;">
+                                        <div style="float: left;vertical-align: middle;">
+                                            <i class="drag icon iconfont icon-yidongdaohang"
+                                               style="font-size: 20px;margin-top:3px;color:#9c9c9c;cursor:move;"></i>
+                                        </div>
+                                        <div style="text-align: right;float: left;width: 50px;margin: 4px 5px 0;">
+                                            作用域
+                                        </div>
+                                        <div style="float: left;width: calc(100% - 130px);margin: 0 5px;">
+                                            <a-input style="width: 100%;" v-model="scopeListener.scopeName"></a-input>
+                                        </div>
+                                        <div style="float: left;vertical-align: middle;">
+                                            <i class="icon iconfont icon-shanchu"
+                                               @click="value.scopeListeners.splice(i,1)"
+                                               style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
+                                        </div>
+                                        <div style="float: left;vertical-align: middle;">
+                                            <i v-if="tableScopeOpened==i" class="icon iconfont icon-xiangshangshouqi-yuankuang"
+                                               @click="tableScopeOpened=-1"
+                                               style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
+                                            <i v-else class="icon iconfont icon-xiangxiazhankai-yuankuang"
+                                               @click="tableScopeOpened=i"
+                                               style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
+                                        </div>
+                                    </div>
+                                    <div style="overflow:hidden;" v-if="tableScopeOpened==i">
+                                        <div style="text-align: right;float: left;width: 70px;margin: 4px 5px 0;">
+                                            响应
+                                        </div>
+                                        <div style="float: left;width: calc(100% - 130px);margin: 0 5px;">
+                                            <a-textarea style="width: 100%;" v-model="scopeListener.handler"></a-textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </draggable>
+                            <a-button type="link" style="margin: 10px;"
+                                      @click="value.scopeListeners.push(
+                                      {
+                                        scopeName:'',
+                                        handler:''
+                                      })">添加列</a-button>
+                        </a-form-item>
+
                     </a-form>
                 </div>
             </a-tab-pane>
@@ -100,21 +195,21 @@
 
 <script>
     import AFormItem from "ant-design-vue/es/form/FormItem";
+    import ATextarea from "ant-design-vue/es/input/TextArea";
     export default {
         name: "DesignerItemProp",
-        components: {AFormItem},
+        components: {ATextarea, AFormItem},
         data(){
             return {
-                form:null
+                form:null,
+                tableColOpened:-1,
+                tableScopeOpened:-1
             }
         },
         props:['value'],
         watch:{
         },
         methods:{
-            testHandler(evt){
-                console.log(evt)
-            }
         },
         computed:{
             keyValidate(){
@@ -132,5 +227,6 @@
         border: 2px solid red;
         width: 100%;
         height: 0px;
+        overflow: hidden;
     }
 </style>

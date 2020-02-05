@@ -8,6 +8,10 @@
                 </a-form-item>
             </designer-form-item>
         </template>
+        <template v-if="parameter.type=='button'">
+            <a-button :type="parameter.btnType"
+                      @click="()=>{$emit('xMessage',{type:'triggerScope',paramPath:paramPath,value:value})}">{{parameter.name}}</a-button>
+        </template>
 
         <template v-if="parameter.type=='datePicker'">
             <designer-form-item :value="parameter">
@@ -21,8 +25,12 @@
         <template v-if="parameter.type=='grid'">
             <a-row>
                 <a-col v-for="(col,i) in parameter.cols" :span="col.span" :key="i">
-                    <x-from style="overflow: auto" :value="value"
-                            :parameter="col.list"></x-from>
+                    <x-form style="overflow: hidden" :value="value"
+                            @xMessage="(val)=>{$emit('xMessage',val)}"
+                            :param-path="paramPath"
+                            :not-root-form="true"
+                            ref="children"
+                            :parameter="col.list"></x-form>
                 </a-col>
             </a-row>
         </template>
@@ -30,8 +38,12 @@
         <template v-if="parameter.type=='tabs'">
             <a-tabs :default-active-key="0">
                 <a-tab-pane v-for="(tab,i) in parameter.tabs" :key="i" :tab="tab.name">
-                    <x-from style="overflow: auto" :value="value"
-                            :parameter="tab.list"></x-from>
+                    <x-form style="overflow: hidden" :value="value"
+                            :param-path="paramPath"
+                            :not-root-form="true"
+                            ref="children"
+                            @xMessage="(val)=>{$emit('xMessage',val)}"
+                            :parameter="tab.list"></x-form>
                 </a-tab-pane>
             </a-tabs>
         </template>
@@ -48,6 +60,13 @@
                 <a-divider :orientation="parameter.orientation" :dashed="parameter.dashed" v-else></a-divider>
             </template>
         </template>
+        <template v-if="parameter.type=='scopeGateway'">
+            <x-scope-gateway :value="value" :param-path="paramPath"
+                             :not-root-form="true"
+                             ref="children"
+                             @xMessage="(val)=>{$emit('xMessage',val)}"
+                             :parameter="parameter"></x-scope-gateway>
+        </template>
 
     </div>
 </template>
@@ -57,10 +76,37 @@
     export default {
         name: "XItem",
         components: {DesignerFormItem},
-        props:["parameter",'value'],
+        props:["parameter",'value','paramPath','notRootForm'],
         created(){
             if(this.parameter.defaultValue&&this.value[this.parameter.key]==null){
                 this.$set(this.value,this.parameter.key,this.parameter.defaultValue)
+            }
+        },
+        data(){
+            return {
+            }
+        },
+        methods:{
+            recursionHandler(message){
+                let children = this.$refs.children
+                if(Array.isArray(children)){
+                    children.forEach(function(child){
+                        child.recursionHandler&&child.recursionHandler(message)
+                    })
+                }
+                else {
+                    children&&children.recursionHandler&&children.recursionHandler(message)
+                }
+                this.scopeMessageHandler(message)
+            },
+            scopeMessageHandler(message){
+                if(this.parameter.scopeListeners){
+                    this.parameter.scopeListeners.forEach(function(scopeListener){
+                        if(scopeListener.scopeName==message.paramPath){
+                            console.log(scopeListener.handler,message.value)
+                        }
+                    })
+                }
             }
         }
     }

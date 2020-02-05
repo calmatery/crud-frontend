@@ -5,7 +5,7 @@
                 <div class="component-list-title">基础字段</div>
                 <div class="component-list-container">
                     <draggable tag="div" :list="basicComponents" :sort="false"
-                               :group="{name: 'designer',pull:'clone'}" >
+                               :group="{name: 'designer',pull:'clone',put:false}" >
                         <div class="component-icon" v-for="(item, index) in basicComponents" :key="index">
                             <i class="icon iconfont" :class="item._icon"></i>
                             <span>{{item.name}}</span>
@@ -15,7 +15,7 @@
                 <div class="component-list-title">布局字段</div>
                 <div class="component-list-container">
                     <draggable tag="div" :list="layoutComponents" :sort="false"
-                               :group="{name: 'designer',pull:'clone'}" >
+                               :group="{name: 'designer',pull:'clone',put:false}" >
                         <div class="component-icon" v-for="(item, index) in layoutComponents" :key="index">
                             <i class="icon iconfont" :class="item._icon"></i>
                             <span>{{item.name}}</span>
@@ -55,7 +55,7 @@
             </div>
         </a-modal>
         <a-modal @cancel="previewVisible=false"
-                 :width="800" style="top: 20px;"
+                 :width="'100%'" style="top:0px;"
                  :destroyOnClose="true"
                  title="预览" :visible="previewVisible">
             <template slot="footer">
@@ -69,9 +69,9 @@
                 </div>
             </template>
 
-            <x-from style="height: 400px;overflow: auto"
+            <x-form style="height: 100%;min-height: 450px;overflow: auto"
                     :value="formVal"
-                    :parameter="value"></x-from>
+                    :parameter="value"></x-form>
         </a-modal>
     </div>
 </template>
@@ -83,22 +83,25 @@
     import {basicComponents, layoutComponents} from './componentsConfig.js'
     import Vue from 'vue';
     import { Icon, Button,Layout,Input,InputNumber,
-        Form,DatePicker,Checkbox,Select,
+        Form,DatePicker,Checkbox,Select,Table,
         Tabs,Modal,Row,Col,Divider,
         message } from 'ant-design-vue';
     import draggable from 'vuedraggable'
     import DesignerPanel from "./DesignerPanel";
     import DesignerItemProp from "./DesignerItemProp";
     import DesignerItem from "./DesignerItem";
-    import XFrom from "./XFrom";
+    import XScopeGateway from './XScopeGateway';
+    import XForm from "./XForm";
     import XItem from "./XItem";
     Vue.component(Button.name, Button);
     Vue.component(Icon.name, Icon);
     Vue.component(Input.name, Input);
+    Vue.component(Input.TextArea.name, Input.TextArea);
     Vue.component(InputNumber.name, InputNumber);
     Vue.component(Checkbox.name, Checkbox);
     Vue.component(Select.name, Select);
     Vue.component(Select.Option.name, Select.Option);
+    Vue.component(Table.name, Table);
     Vue.component(DatePicker.name, DatePicker);
     Vue.component(DatePicker.MonthPicker.name, DatePicker.MonthPicker);
     Vue.component(DatePicker.RangePicker.name, DatePicker.RangePicker);
@@ -118,8 +121,9 @@
     Vue.component(draggable.name, draggable);
     Vue.component(DesignerPanel.name,DesignerPanel)
     Vue.component(DesignerItem.name,DesignerItem)
-    Vue.component(XFrom.name,XFrom)
+    Vue.component(XForm.name,XForm)
     Vue.component(XItem.name,XItem)
+    Vue.component(XScopeGateway.name,XScopeGateway)
     export default {
         name: "Designer",
         components: {DesignerItemProp, DesignerPanel},
