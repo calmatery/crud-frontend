@@ -32,6 +32,7 @@ export const basicComponents = [
                 dataIndex: "col2"
             }
         ],
+        slots:[],
         scopeListeners:[]
     }
 ]
@@ -75,5 +76,12 @@ export const layoutComponents = [
         name: '作用域网关',
         _icon: 'icon-wangguan',
         list:[]
+    },
+    {
+        type: 'modal',
+        name: '模态窗',
+        _icon: 'icon-tanchuceng',
+        list:[],
+        visible:false
     }
 ]

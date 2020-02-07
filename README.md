@@ -24,3 +24,32 @@ npm run test
 ```
 npm run lint
 ```
+
+xMessage类型
+1、triggerScope:触发XScopeGateway发出scope消息
+2、scope消息：触发根节点向内调用recursionHandler
+
+
+常量参数：scopeMes
+
+数据赋值
+a=1     //赋值数值
+a="1"       //赋值字符串
+a=:b        //赋值变量
+
+a=[users]       //赋值远程变量
+a=[users,scopeMes]      //赋值远程变量带参数????
+[+users]=scopeMes   //新增
+[-users]=scopeMes   //删除
+[>users]=scopeMes   //修改
+
+分页、排序
+
+$p表示当前参数
+$v表示当前value
+$rp表示根节点参数
+$rv表示根节value
+
+
+
+

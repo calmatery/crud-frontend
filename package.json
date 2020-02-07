@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "ant-design-vue": "^1.4.10",
+    "axios": "^0.19.2",
     "core-js": "^2.6.5",
     "jsoneditor": "^8.4.1",
     "vue": "^2.6.10",

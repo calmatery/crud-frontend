@@ -22,8 +22,14 @@
         </template>
 
         <template v-if="value.type=='table'">
-            <a-table :columns="value.cols" bordered>
-            </a-table>
+            <a-table :columns="value.cols" bordered></a-table>
+            <div v-for="(slot,i) in value.slots" style="border-top: 1px dashed #aaaaaa;"
+                 :key="i">
+                <designer-panel
+                        :list.sync="slot.list"
+                        :selected.sync="selectedItem"></designer-panel>
+            </div>
+
         </template>
 
 
@@ -65,7 +71,7 @@
             </template>
         </template>
 
-        <template v-if="value.type=='scopeGateway'">
+        <template v-if="['scopeGateway','modal'].indexOf(value.type)>=0">
             <div style="margin: 1px;">
                 <designer-panel :selected.sync="selectedItem"
                                 :list.sync="value.list"></designer-panel>

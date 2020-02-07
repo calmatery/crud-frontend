@@ -5,6 +5,7 @@
                 :value="value[parameter.key]"
                 :not-root-form="true"
                 ref="children"
+                :root="vRoot"
                 :parameter="parameter.list"></x-form>
     </div>
 </template>
@@ -12,12 +13,13 @@
 <script>
     export default {
         name: "XScopeGateway",
-        props:['value','parameter','paramPath','notRootForm'],
+        props:['value','parameter','paramPath','notRootForm','root'],
         created(){
             this.$set(this.value,this.parameter.key,{})
         },
         data(){
             return {
+                vRoot:this.root
             }
         },
         methods:{

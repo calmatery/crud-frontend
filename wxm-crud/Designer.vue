@@ -139,11 +139,55 @@
                 value:{
                     "list": [
                         {
-                            "type": "input",
-                            "name": "文本1",
-                            "defaultValue": "",
-                            "placeholder": "请输入文本",
-                            "key": "input_1580644922425_77230"
+                            "type": "scopeGateway",
+                            "name": "作用域网关",
+                            "list": [
+                                {
+                                    "type": "button",
+                                    "name": "按钮",
+                                    "btnType": "primary",
+                                    "key": "button_1580896611142_86318"
+                                }
+                            ],
+                            "key": "s1"
+                        },
+                        {
+                            "type": "table",
+                            "name": "报表",
+                            "cols": [
+                                {
+                                    "title": "标识",
+                                    "dataIndex": "id"
+                                },
+                                {
+                                    "title": "名称",
+                                    "dataIndex": "name"
+                                }
+                            ],
+                            "slots":[],
+                            "scopeListeners": [
+                                {
+                                    "scopeName": "s1",
+                                    "handler": "$rp.[table1].loading=true;\n$v.table1=[user-info]\n$p.loading=false\n$rp.[modal1].visible=true"
+                                }
+                            ],
+                            "key": "table1",
+                            "loading": false
+                        },
+                        {
+                            "type": "modal",
+                            "name": "模态窗",
+                            "list": [
+                                {
+                                    "type": "input",
+                                    "name": "文本1",
+                                    "defaultValue": "",
+                                    "placeholder": "请输入文本",
+                                    "key": "input_1580644922425_77230"
+                                }
+                            ],
+                            "visible": false,
+                            "key": "modal1"
                         },
                         {
                             "type": "tabs",

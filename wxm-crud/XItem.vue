@@ -21,6 +21,15 @@
                 </a-form-item>
             </designer-form-item>
         </template>
+        <template v-if="parameter.type=='table'">
+            <a-table :columns="parameter.cols"
+                     :dataSource="value[parameter.key]"
+                     :loading="parameter.loading"
+                     record="id"
+                     bordered>
+            </a-table>
+        </template>
+
 
         <template v-if="parameter.type=='grid'">
             <a-row>
@@ -30,6 +39,7 @@
                             :param-path="paramPath"
                             :not-root-form="true"
                             ref="children"
+                            :root="vRoot"
                             :parameter="col.list"></x-form>
                 </a-col>
             </a-row>
@@ -42,6 +52,7 @@
                             :param-path="paramPath"
                             :not-root-form="true"
                             ref="children"
+                            :root="vRoot"
                             @xMessage="(val)=>{$emit('xMessage',val)}"
                             :parameter="tab.list"></x-form>
                 </a-tab-pane>
@@ -64,8 +75,22 @@
             <x-scope-gateway :value="value" :param-path="paramPath"
                              :not-root-form="true"
                              ref="children"
+                             :root="vRoot"
                              @xMessage="(val)=>{$emit('xMessage',val)}"
                              :parameter="parameter"></x-scope-gateway>
+        </template>
+
+        <template v-if="parameter.type=='modal'">
+            <a-modal :visible="parameter.visible" :title="parameter.name">
+                <x-form style="overflow: hidden" :value="value"
+                        @xMessage="(val)=>{$emit('xMessage',val)}"
+                        :param-path="paramPath"
+                        :not-root-form="true"
+                        ref="children"
+                        :root="vRoot"
+                        :parameter="parameter.list">
+                </x-form>
+            </a-modal>
         </template>
 
     </div>
@@ -73,10 +98,11 @@
 
 <script>
     import DesignerFormItem from "./DesignerFormItem";
+import XRuntime from './XRuntime'
     export default {
         name: "XItem",
         components: {DesignerFormItem},
-        props:["parameter",'value','paramPath','notRootForm'],
+        props:["parameter",'value','paramPath','notRootForm','root'],
         created(){
             if(this.parameter.defaultValue&&this.value[this.parameter.key]==null){
                 this.$set(this.value,this.parameter.key,this.parameter.defaultValue)
@@ -84,6 +110,8 @@
         },
         data(){
             return {
+                vRoot:this.root,
+                dataSource:null
             }
         },
         methods:{
@@ -100,10 +128,13 @@
                 this.scopeMessageHandler(message)
             },
             scopeMessageHandler(message){
+                let me = this
                 if(this.parameter.scopeListeners){
                     this.parameter.scopeListeners.forEach(function(scopeListener){
                         if(scopeListener.scopeName==message.paramPath){
-                            console.log(scopeListener.handler,message.value)
+                            let xRuntime = new XRuntime(scopeListener.handler)
+                            xRuntime.validate(me)
+                            xRuntime.exec(message.value,me.root)
                         }
                     })
                 }

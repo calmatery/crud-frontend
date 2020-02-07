@@ -3,6 +3,7 @@
         <x-item @xMessage="xMessageHandler"
                 :not-root-form="true"
                 ref="children"
+                :root="vRoot"
                 v-for="item in (Array.isArray(parameter)?parameter:parameter.list)" :key="item.key"
                 :value="value" :parameter="item" :param-path="paramPath"></x-item>
     </div>
@@ -11,15 +12,20 @@
 <script>
     export default {
         name: "XForm",
-        props:["parameter",'value','paramPath','notRootForm'],
+        props:["parameter",'value','paramPath','notRootForm','root'],
+        created(){
+            if(!this.notRootForm){
+                this.$set(this,'vRoot',this)
+            }
+        },
         data(){
             return {
+                vRoot:this.root
             }
         },
         methods:{
             xMessageHandler(message){
                 if(!this.notRootForm){
-                    console.log('root',this.$el,message)
                     this.recursionHandler(message)
                 }
                 this.$emit('xMessage',message)

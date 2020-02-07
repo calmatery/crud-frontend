@@ -135,6 +135,38 @@
                                       })">添加列</a-button>
                         </a-form-item>
 
+
+                        <a-form-item v-if="value.type=='table'" label="插槽">
+                            <draggable handle=".drag"
+                                       ghostClass="dragging"
+                                       v-model="value.slots">
+                                <div v-for="(slot,i) in value.slots" :key="i" :style="i>0?'margin-top: 10px;':''">
+                                    <div style="display: inline-block;vertical-align: middle;">
+                                        <i class="drag icon iconfont icon-yidongdaohang"
+                                           style="font-size: 20px;margin-top:3px;color:#9c9c9c;cursor:move;"></i>
+                                    </div>
+                                    <div style="text-align: right;display: inline-block;width: 50px;margin: 0 5px;">
+                                        名称
+                                    </div>
+                                    <div style="display: inline-block;width: calc(100% - 110px);margin: 0 5px;">
+                                        <a-input style="width: 100%;" v-model="slot.title"></a-input>
+                                    </div>
+                                    <div style="display: inline-block;vertical-align: middle;">
+                                        <i class="icon iconfont icon-shanchu"
+                                           @click="value.slots.splice(i,1)"
+                                           style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
+                                    </div>
+                                </div>
+                            </draggable>
+                            <a-button type="link" style="margin: 10px;"
+                                      @click="value.slots.push(
+                                      {
+                                        slot:'slot',
+                                        list:[]
+                                      })">添加列</a-button>
+                        </a-form-item>
+
+
                         <a-form-item v-if="value.type=='table'" label="作用域消息监听">
                             <draggable handle=".drag"
                                        ghostClass="dragging"
@@ -187,7 +219,7 @@
                     </a-form>
                 </div>
             </a-tab-pane>
-            <a-tab-pane tab="全局属性" key="2">
+            <a-tab-pane tab="容器属性" key="2">
             </a-tab-pane>
         </a-tabs>
     </div>

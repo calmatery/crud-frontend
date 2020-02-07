@@ -9,6 +9,8 @@ import App from './App';
 // Vue.component(Layout.Sider.name, Layout.Sider);
 // Vue.component(Layout.Footer.name, Layout.Footer);
 
+
+
 Vue.config.productionTip = false;
 
 new Vue({
