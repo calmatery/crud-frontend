@@ -25,11 +25,13 @@ export const basicComponents = [
         cols: [
             {
                 title: "列1",
-                dataIndex: "col1"
+                dataIndex: "col1",
+                isSlot:false
             },
             {
                 title: "列2",
-                dataIndex: "col2"
+                dataIndex: "col2",
+                isSlot:false
             }
         ],
         slots:[],
@@ -83,5 +85,11 @@ export const layoutComponents = [
         _icon: 'icon-tanchuceng',
         list:[],
         visible:false
-    }
+    },
+    {
+        type: 'container',
+        name: '容器',
+        _icon: 'icon-juxing',
+        list:[]
+    },
 ]

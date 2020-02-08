@@ -10,7 +10,6 @@
                             <a-input v-model="value.key"></a-input>
                         </a-form-item>
 
-
                         <a-form-item v-if="value.type=='divider'"
                                      label="标题">
                             <a-input v-model="value.name"></a-input>
@@ -19,6 +18,40 @@
                                      :help="value.name&&value.name.trim()?'':'内容不能为空！'"
                                      label="标题">
                             <a-input v-model="value.name"></a-input>
+                        </a-form-item>
+
+                        <a-form-item v-if="value.type=='button'" label="点击事件">
+                            <a-textarea v-model="value.clickHandler"></a-textarea>
+                        </a-form-item>
+
+                        <a-form-item v-if="value.type=='modal'" label="确认事件">
+                            <a-textarea v-model="value.okHandler"></a-textarea>
+                        </a-form-item>
+                        <a-form-item v-if="value.type=='modal'" label="取消事件">
+                            <a-textarea v-model="value.cancelHandler"></a-textarea>
+                        </a-form-item>
+
+                        <a-form-item label="行内块布局">
+                            <a-checkbox v-model="value.inline">开启</a-checkbox>
+                        </a-form-item>
+
+                        <a-form-item label="边距">
+                            <div style="display: inline-block;width: 50%;">
+                                <label style="display: inline-block;width:40px;text-align: right;">上</label>
+                                <a-input style="width: calc(100% - 50px);margin: 0 5px;" v-model="value.marginTop"></a-input>
+                            </div>
+                            <div style="display: inline-block;width: 50%;">
+                                <label style="display: inline-block;width:40px;text-align: right;">右</label>
+                                <a-input style="width: calc(100% - 50px);margin: 0 5px;" v-model="value.marginRight"></a-input>
+                            </div>
+                            <div style="display: inline-block;width: 50%;">
+                                <label style="display: inline-block;width:40px;text-align: right;">下</label>
+                                <a-input style="width: calc(100% - 50px);margin: 0 5px;" v-model="value.marginBottom"></a-input>
+                            </div>
+                            <div style="display: inline-block;width: 50%;">
+                                <label style="display: inline-block;width:40px;text-align: right;">左</label>
+                                <a-input style="width: calc(100% - 50px);margin: 0 5px;" v-model="value.marginLeft"></a-input>
+                            </div>
                         </a-form-item>
 
                         <a-form-item v-if="['input'].indexOf(value.type)>=0" label="默认值">
@@ -118,11 +151,30 @@
                                            style="font-size: 20px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
                                     </div>
                                     <div v-if="tableColOpened==i">
-                                        <div style="text-align: right;display: inline-block;width: 70px;margin: 0 5px;">
-                                            数据标识
-                                        </div>
-                                        <div style="display: inline-block;width: calc(100% - 130px);margin: 0 5px;">
-                                            <a-input style="width: 100%;" v-model="col.dataIndex"></a-input>
+
+                                        <template v-if="col.isSlot==true">
+                                            <div style="text-align: right;display: inline-block;width: 70px;margin: 0 5px;">
+                                                插槽
+                                            </div>
+                                            <div style="display: inline-block;width: calc(100% - 130px);margin: 0 5px;">
+                                                <a-input v-if="col.scopedSlots"
+                                                         style="width: 100%;" v-model="col.scopedSlots.customRender"></a-input>
+                                            </div>
+                                        </template>
+
+                                        <template v-else>
+                                            <div style="text-align: right;display: inline-block;width: 70px;margin: 0 5px;">
+                                                数据标识
+                                            </div>
+                                            <div style="display: inline-block;width: calc(100% - 130px);margin: 0 5px;">
+                                                <a-input style="width: 100%;" v-model="col.dataIndex"></a-input>
+                                            </div>
+                                        </template>
+
+                                        <div style="display: inline-block;vertical-align: middle;">
+                                            <i class="icon iconfont icon-zhuanhuan"
+                                               @click="transferHandler(col)"
+                                               style="font-size: 18px;margin-top:3px;color:#ea4e1d;cursor: pointer;"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -131,7 +183,9 @@
                                       @click="value.cols.push(
                                       {
                                         title:'',
-                                        dataIndex:''
+                                        dataIndex:'',
+                                        isSlot:false,
+                                        scopedSlots:{}
                                       })">添加列</a-button>
                         </a-form-item>
 
@@ -220,6 +274,16 @@
                 </div>
             </a-tab-pane>
             <a-tab-pane tab="容器属性" key="2">
+                <a-form v-if="props" :layout="'vertical'">
+                    <a-form-item label="对齐方式">
+                        <a-radio-group v-model="props.textAlign" defaultValue="" buttonStyle="solid">
+                            <a-radio-button value="">默认</a-radio-button>
+                            <a-radio-button value="left;">左对齐</a-radio-button>
+                            <a-radio-button value="center;">居中</a-radio-button>
+                            <a-radio-button value="right;">右对齐</a-radio-button>
+                        </a-radio-group>
+                    </a-form-item>
+                </a-form>
             </a-tab-pane>
         </a-tabs>
     </div>
@@ -238,10 +302,22 @@
                 tableScopeOpened:-1
             }
         },
-        props:['value'],
+        props:['value','props'],
         watch:{
         },
         methods:{
+            transferHandler(col){
+                console.log(col)
+                col.isSlot=(!col.isSlot)
+                if(col.isSlot){
+                    col.scopedSlots={ customRender: col.dataIndex }
+                    col.dataIndex = undefined
+                }
+                else {
+                    col.dataIndex=col.scopedSlots.customRender
+                    col.scopedSlots=undefined
+                }
+            }
         },
         computed:{
             keyValidate(){

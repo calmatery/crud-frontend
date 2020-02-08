@@ -21,7 +21,7 @@
         float:left;
         text-align: right;
         padding-right: 10px;
-        line-height: 40px;
+        line-height: 32px;
     }
 
 </style>

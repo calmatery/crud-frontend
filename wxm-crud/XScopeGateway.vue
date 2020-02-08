@@ -3,6 +3,7 @@
         <x-form v-if="value" style="overflow: hidden" @xMessage="xMessageHandler"
                 :param-path="(paramPath?paramPath+'.':'')+parameter.key"
                 :value="value[parameter.key]"
+                :container-props="parameter.props"
                 :not-root-form="true"
                 ref="children"
                 :root="vRoot"

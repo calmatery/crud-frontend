@@ -34,17 +34,19 @@
                     <a-button @click="previewHandler" type="link">
                         <i class="icon iconfont icon-preview"></i>预览
                     </a-button>
-                    <a-button @click="value.list=[]" type="link">
+                    <a-button @click="value.list=[];value.props={}" type="link">
                         <i class="icon iconfont icon-trash"></i>清空
                     </a-button>
                     <a-button @click="jsonEditorVisible=true" type="link">
                         <i class="icon iconfont icon-json"></i>JSON序列化
                     </a-button>
                 </div>
-                <designer-panel :selected.sync="selectedItem" :list.sync="value.list"></designer-panel>
+                <designer-panel :selected.sync="selectedItem"
+                                :container-props="value.props"
+                                :list.sync="value.list"></designer-panel>
             </a-layout-content>
             <a-layout-sider :width="300">
-                <designer-item-prop :value="selectedItem"></designer-item-prop>
+                <designer-item-prop :props="containerProps" :value="selectedItem"></designer-item-prop>
             </a-layout-sider>
         </a-layout>
         <a-modal okText="确认" cancelText="取消"
@@ -71,6 +73,7 @@
 
             <x-form style="height: 100%;min-height: 450px;overflow: auto"
                     :value="formVal"
+                    :container-props="value.props"
                     :parameter="value"></x-form>
         </a-modal>
     </div>
@@ -82,7 +85,7 @@
     import 'jsoneditor/dist/jsoneditor.css'
     import {basicComponents, layoutComponents} from './componentsConfig.js'
     import Vue from 'vue';
-    import { Icon, Button,Layout,Input,InputNumber,
+    import { Icon, Button,Layout,Input,InputNumber,Radio,
         Form,DatePicker,Checkbox,Select,Table,
         Tabs,Modal,Row,Col,Divider,
         message } from 'ant-design-vue';
@@ -99,6 +102,8 @@
     Vue.component(Input.TextArea.name, Input.TextArea);
     Vue.component(InputNumber.name, InputNumber);
     Vue.component(Checkbox.name, Checkbox);
+    Vue.component(Radio.Group.name, Radio.Group);
+    Vue.component(Radio.Button.name, Radio.Button);
     Vue.component(Select.name, Select);
     Vue.component(Select.Option.name, Select.Option);
     Vue.component(Table.name, Table);
@@ -136,7 +141,9 @@
             return{
                 basicComponents,
                 layoutComponents,
+                containerProps:null,
                 value:{
+                    "props": {},
                     "list": [
                         {
                             "type": "scopeGateway",
@@ -146,10 +153,12 @@
                                     "type": "button",
                                     "name": "按钮",
                                     "btnType": "primary",
-                                    "key": "button_1580896611142_86318"
+                                    "key": "button_1580896611142_86318",
+                                    "clickHandler": "scopeMessage(\"s1\")"
                                 }
                             ],
-                            "key": "s1"
+                            "key": "s1",
+                            "props": {}
                         },
                         {
                             "type": "table",
@@ -157,18 +166,50 @@
                             "cols": [
                                 {
                                     "title": "标识",
-                                    "dataIndex": "id"
+                                    "dataIndex": "id",
+                                    "isSlot": false
                                 },
                                 {
                                     "title": "名称",
-                                    "dataIndex": "name"
+                                    "dataIndex": "name",
+                                    "isSlot": false
+                                },
+                                {
+                                    "title": "操作",
+                                    "isSlot": true,
+                                    "scopedSlots": {
+                                        "customRender": "name1"
+                                    }
                                 }
                             ],
-                            "slots":[],
+                            "slots": [
+                                {
+                                    "slot": "slot",
+                                    "list": [
+                                        {
+                                            "type": "button",
+                                            "name": "按钮",
+                                            "btnType": "primary",
+                                            "key": "button_1581166328834_95830",
+                                            "inline": true,
+                                            "clickHandler": "$rp.[modal1].visible=true;\n$rv.s2.input_id=:$s.record.id"
+                                        },
+                                        {
+                                            "type": "button",
+                                            "name": "按钮",
+                                            "btnType": "primary",
+                                            "key": "button_1581166468506_18057",
+                                            "inline": true
+                                        }
+                                    ],
+                                    "title": "name1",
+                                    "props": {}
+                                }
+                            ],
                             "scopeListeners": [
                                 {
                                     "scopeName": "s1",
-                                    "handler": "$rp.[table1].loading=true;\n$v.table1=[user-info]\n$p.loading=false\n$rp.[modal1].visible=true"
+                                    "handler": "$rp.[table1].loading=true;\n$v.table1=[user-info]\n$p.loading=false"
                                 }
                             ],
                             "key": "table1",
@@ -179,15 +220,32 @@
                             "name": "模态窗",
                             "list": [
                                 {
-                                    "type": "input",
-                                    "name": "文本1",
-                                    "defaultValue": "",
-                                    "placeholder": "请输入文本",
-                                    "key": "input_1580644922425_77230"
+                                    "type": "scopeGateway",
+                                    "name": "作用域网关",
+                                    "list": [
+                                        {
+                                            "type": "input",
+                                            "name": "输入框",
+                                            "defaultValue": "",
+                                            "placeholder": "",
+                                            "key": "input_id"
+                                        },
+                                        {
+                                            "type": "input",
+                                            "name": "输入框",
+                                            "defaultValue": "",
+                                            "placeholder": "",
+                                            "key": "input_name"
+                                        }
+                                    ],
+                                    "key": "s2",
+                                    "props": {}
                                 }
                             ],
                             "visible": false,
-                            "key": "modal1"
+                            "key": "modal1",
+                            "props": {},
+                            "okHandler": "$p.visible=false"
                         },
                         {
                             "type": "tabs",
@@ -398,6 +456,25 @@
                     console.error(err)
                     message.error('JSON格式异常！');
                 }
+            },
+            getContainer(val){
+                let objs = []
+                objs.push(this.value)
+                while (objs.length>0){
+                    let obj = objs.pop()
+                    for (let key in obj) {
+                        let item = obj[key]
+                        if(Array.isArray(item)){
+                            for (let i = 0; i < item.length; i++) {
+                                let arrayItem = item[i]
+                                if(arrayItem==val){
+                                    return obj
+                                }
+                                objs.push(arrayItem)
+                            }
+                        }
+                    }
+                }
             }
         },
         watch:{
@@ -425,6 +502,18 @@
                             this.jsonEditor.set(this.value)
                         }
                     })
+                }
+            },
+            selectedItem(val){
+                if(val!=null){
+                    let container = this.getContainer(val)
+                    if(!container.props){
+                        container.props={}
+                    }
+                    this.containerProps=container.props
+                }
+                else{
+                    this.containerProps={}
                 }
             }
         }
@@ -473,6 +562,9 @@
     }
     .wxm-crud-designer .component-icon:hover{
         border: 1px dashed #409eff;
+    }
+    .wxm-crud-designer .designerPanel>div{
+        padding-bottom: 20px;
     }
 
 </style>

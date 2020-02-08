@@ -1,20 +1,22 @@
 <template>
     <div class="designerPanel">
-        <a-form :form="form">
-            <draggable :style="'min-height:50px'" group="designer" handle=".component-drag"
-                       ghostClass="dragging"
-                   v-model="itemList" @add="itemAdd">
-                <designer-item @itemDel="itemDel" v-for="item in itemList" :key="item.key"
-                                 :value="item" :selected.sync="selectedItem"></designer-item>
-            </draggable>
-        </a-form>
+        <draggable :style="'min-height:30px;'
+                   + (containerProps&&containerProps.textAlign?('text-align:'+containerProps.textAlign+';'):'')"
+                   group="designer" handle=".component-drag"
+                   ghostClass="dragging"
+               v-model="itemList" @add="itemAdd">
+            <designer-item @itemDel="itemDel"
+                           :container-props="containerProps"
+                           v-for="item in itemList" :key="item.key"
+                             :value="item" :selected.sync="selectedItem"></designer-item>
+        </draggable>
     </div>
 </template>
 
 <script>
     export default {
         name: "DesignerPanel",
-        props: ["list",'selected'],
+        props: ["list",'selected','containerProps'],
         created() {
             // this.selectedItem = this.selected;
         },
@@ -49,6 +51,7 @@
                         scopeListeners.push({...scopeListener})
                     })
                     itemValue.scopeListeners = scopeListeners
+                    itemValue.slots = []
                 }
 
                 Object.keys(itemValue).map((key)=>{
@@ -94,7 +97,7 @@
 
 <style>
     .wxm-crud-designer .designerPanel{
-        padding: 0px 4px 10px 4px;
+        padding: 0px 4px 6px 4px;
     }
     .wxm-crud-designer .designerPanel .component-icon,
     .wxm-crud-designer .designerPanel .dragging,
@@ -106,7 +109,17 @@
         outline: none;
         overflow: hidden;
     }
-    .wxm-crud-designer .designerPanel .dragging{
-        float: left;
+
+    .wxm-crud-designer .designerPanel .component-icon.inline,
+    .wxm-crud-designer .designerPanel .dragging.inline,
+    .wxm-crud-designer .designerPanel .component-icon.inline:hover {
+        border: 2px solid red;
+        width: 0;
+        height: 100%;
+        margin: 0;
+        outline: none;
+        overflow: hidden;
     }
+
+
 </style>

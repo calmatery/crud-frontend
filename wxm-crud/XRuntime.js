@@ -25,6 +25,26 @@ class XVariable{
         // else{
         // }
     }
+    getValue(){
+        if(this.def.startsWith("$v.")){
+            return this.xRuntime.xItem.value[this.def.substr(3)]
+        }
+        else if(this.def.startsWith("$rv.")||this.def.startsWith("$rp.")){
+            return this.getParentObject()[this.prop]
+        }
+        else if(this.def.startsWith("$p.")){
+            return this.xRuntime.xItem.parameter[this.def.substr(3)]
+        }
+        else if(this.def.startsWith("$s.")){
+            let obj = this.xRuntime.runtimeEnv
+            let pathStr = this.def.substr(3)
+            let pathArr = pathStr.split(".")
+            pathArr.forEach(function(pathItem){
+                obj = obj[pathItem]
+            })
+            return obj
+        }
+    }
     getParentObject(){
         let obj = null
         let pathStr = this.def.substr(4)
@@ -83,23 +103,44 @@ class XVariable{
 }
 
 class XCommand{
-    constructor(commandStr) {
+    constructor(commandStr,xRuntime) {
+        this.xRuntime = xRuntime
         this.nextCommand = null
         let arr = commandStr.split('=')
+        this.isFun = false
+        this.isRemote = false
+        if(arr.length==1){
+            this.isFun=true
+        }
         this.left=arr[0].trim()
-        this.right=arr[1].trim()
         this.leftIsRemote = this.whetherRemote(this.left)
-        this.rightIsRemote = this.whetherRemote(this.right)
-        this.isRemote = this.leftIsRemote||this.rightIsRemote
+        if(!this.isFun) {
+            this.right = arr[1].trim()
+            this.rightIsRemote = this.whetherRemote(this.right)
+            this.isRemote = this.leftIsRemote||this.rightIsRemote
+        }
     }
     whetherRemote(expression){
         return expression.startsWith('[')&&expression.endsWith(']')
     }
-    exec(params,xRuntime){
+    execFun(){
+        let tmpArr = this.left.split('(')
+        let funName = tmpArr[0]
+        let params=[]
+        if(tmpArr[1].length>1){
+            tmpArr[1]=tmpArr[1].substr(0,tmpArr[1].length-1)
+            params=tmpArr[1].split(',')
+            for (let i = 0; i < params.length; i++) {
+                params[i]=this.getJsonVal(params[i])
+            }
+        }
+        this["__"+funName].apply(this,params)
+    }
+    exec(){
         let me = this
         let promise = new Promise(function(resolve,reject){
             if(me.isRemote){
-                axios.get(me.getRemoteUrl(),params)
+                axios.get(me.getRemoteUrl())
                     .then(resolve)
                     .catch(reject)
             }
@@ -108,27 +149,32 @@ class XCommand{
             }
         })
         promise.then(function(res){
-            console.log(res)
-            if(me.isRemote){
+            if(me.isFun){
+                me.execFun()
+            }
+            else if(me.isRemote){
                 if(me.leftIsRemote){
                     console.log(1)
                 }
                 else {
-                    let xVar = new XVariable(me.left,xRuntime)
+                    let xVar = new XVariable(me.left,me.xRuntime)
                     xVar.setValue(res.data)
                 }
             }
             else {
                 if(me.right.startsWith(':')){
-                    xRuntime.xItem[me.left]=xRuntime.xItem[me.right]
+                    let leftVar = new XVariable(me.left,me.xRuntime)
+                    let rightVar = new XVariable(me.right.substr(1),me.xRuntime)
+                    let rightVal = rightVar.getValue()
+                    leftVar.setValue(rightVal)
                 }
                 else {
-                    let tmp = JSON.parse('{"t":'+me.right+'}')
-                    let xVar = new XVariable(me.left,xRuntime)
-                    xVar.setValue(tmp.t)
+                    let xVar = new XVariable(me.left,me.xRuntime)
+                    let val = me.getJsonVal(me.right)
+                    xVar.setValue(val)
                 }
             }
-            me.nextCommand&&me.nextCommand.exec(params,xRuntime)
+            me.nextCommand&&me.nextCommand.exec()
         },function(){
         })
     }
@@ -146,38 +192,55 @@ class XCommand{
         urlWithParam = urlWithParam.substr(1,urlWithParam.length-2)
         return urlWithParam
     }
+    getJsonVal(val){
+        let tmp = JSON.parse('{"t":'+val+'}')
+        return tmp.t
+    }
+    __test(param1,param2){
+        console.log(param1,param2)
+    }
+    __scopeMessage(scopeName){
+        if(scopeName){
+            this.xRuntime.root.recursionHandler(
+                {
+                    type:'scopeMessage',scopeName:scopeName
+                })
+        }
+    }
 }
 
 export default class{
-    constructor(content){
-        this.content = content;
+    constructor(content,xItem){
+        this.content = content
+        this.xItem = xItem
         this.commands=[]
-        this.xItem = null
-        this.root = null
+        this.root = xItem.root
+        this.runtimeEnv={}
     }
     validate(me){
-        this.xItem = me
-        let commandStrs=this.content.split(/;|\n/)
-         commandStrs = commandStrs.filter(function(command){
-            return command&&command.trim()
-        })
-        me = this
-        commandStrs.forEach(function(commandStr){
-            let command =new XCommand(commandStr)
-            me.commands.push(command)
-        })
-        let tmpCommand = null
-        this.commands.forEach(function(command){
-            if(tmpCommand){
-                tmpCommand.nextCommand=command
-            }
-            tmpCommand=command
-        })
+        if(this.content){
+            let commandStrs=this.content.split(/;|\n/)
+            commandStrs = commandStrs.filter(function(command){
+                return command&&command.trim()
+            })
+            me = this
+            commandStrs.forEach(function(commandStr){
+                let command =new XCommand(commandStr,me)
+                me.commands.push(command)
+            })
+            let tmpCommand = null
+            this.commands.forEach(function(command){
+                if(tmpCommand){
+                    tmpCommand.nextCommand=command
+                }
+                tmpCommand=command
+            })
+        }
     }
-    exec(params,root){
-        this.root = root
+    exec(params){
+        this.runtimeEnv = params
         if(this.commands.length>0){
-            this.commands[0].exec(params,this)
+            this.commands[0].exec(params)
         }
     }
 

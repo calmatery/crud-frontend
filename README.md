@@ -50,6 +50,8 @@ $v表示当前value
 $rp表示根节点参数
 $rv表示根节value
 
+$s表示系统参数，在特定场景由系统生成：
+如table行中的按钮会生成$s.record
 
 
 

@@ -1,23 +1,25 @@
 <template>
-    <div :class="selectedItem!==value?'item':'item-selected'" @click.stop="clickHandler">
+    <div :class="(selectedItem!==value?'item':'item-selected')+(value.inline==true?' inline':'')"
+         :style="(value.inline==true?'display:inline-block;margin-left:4px;':'')
+            +(value.marginTop?'margin-top:'+value.marginTop+';':'')
+            +(value.marginRight?'margin-right:'+value.marginRight+';':'')
+            +(value.marginBottom?'margin-bottom:'+value.marginBottom+';':'')
+            +(value.marginLeft?'margin-left:'+value.marginLeft+';':'')"
+         @click.stop="clickHandler">
         <!--基础字段-->
         <template v-if="value.type=='button'">
                     <a-button :type="value.btnType">{{value.name}}</a-button>
         </template>
         <template v-if="value.type=='input'">
             <designer-form-item :value="value">
-                <a-form-item>
-                    <a-input :placeholder="value.placeholder"
-                             :read-only="true" v-model="value.defaultValue"></a-input>
-                </a-form-item>
+                <a-input :placeholder="value.placeholder"
+                         :read-only="true" v-model="value.defaultValue"></a-input>
             </designer-form-item>
         </template>
         <template v-if="value.type=='datePicker'">
             <designer-form-item :value="value">
-                <a-form-item>
-                    <a-date-picker :placeholder="value.placeholder"
-                                   v-model="value.defaultValue"></a-date-picker>
-                </a-form-item>
+                <a-date-picker :placeholder="value.placeholder"
+                               v-model="value.defaultValue"></a-date-picker>
             </designer-form-item>
         </template>
 
@@ -26,10 +28,10 @@
             <div v-for="(slot,i) in value.slots" style="border-top: 1px dashed #aaaaaa;"
                  :key="i">
                 <designer-panel
+                        :container-props="slot.props"
                         :list.sync="slot.list"
                         :selected.sync="selectedItem"></designer-panel>
             </div>
-
         </template>
 
 
@@ -40,8 +42,9 @@
                     <div style="margin:2px 1px;
                         border:1px dashed #aaaaaa;background-color: #FFF">
                         <designer-panel
-                                        :selected.sync="selectedItem"
-                                        :list.sync="col.list"></designer-panel>
+                                :container-props="col.props"
+                                :selected.sync="selectedItem"
+                                :list.sync="col.list"></designer-panel>
                     </div>
                 </a-col>
             </a-row>
@@ -53,6 +56,7 @@
                     <div style="margin:2px 1px;
                         border:1px dashed #aaaaaa;background-color: #FFF">
                         <designer-panel
+                                :container-props="tab.props"
                                 :selected.sync="selectedItem"
                                 :list.sync="tab.list"></designer-panel>
                     </div>
@@ -71,9 +75,10 @@
             </template>
         </template>
 
-        <template v-if="['scopeGateway','modal'].indexOf(value.type)>=0">
+        <template v-if="['scopeGateway','modal','container'].indexOf(value.type)>=0">
             <div style="margin: 1px;">
                 <designer-panel :selected.sync="selectedItem"
+                                :container-props="value.props"
                                 :list.sync="value.list"></designer-panel>
             </div>
         </template>
@@ -89,12 +94,11 @@
 </template>
 
 <script>
-    import AFormItem from "ant-design-vue/es/form/FormItem";
     import DesignerFormItem from "./DesignerFormItem";
     export default {
         name: "DesignerItem",
-        components: {DesignerFormItem, AFormItem},
-        props:["value",'selected'],
+        components: {DesignerFormItem},
+        props:["value",'selected','containerProps'],
         data(){
             return{
                 selectedItem : this.selected,

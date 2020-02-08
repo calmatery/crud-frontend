@@ -1,8 +1,9 @@
 <template>
-    <div>
+    <div :style="containerProps&&containerProps.textAlign?('text-align:'+containerProps.textAlign+';'):''">
         <x-item @xMessage="xMessageHandler"
                 :not-root-form="true"
                 ref="children"
+                :record="record"
                 :root="vRoot"
                 v-for="item in (Array.isArray(parameter)?parameter:parameter.list)" :key="item.key"
                 :value="value" :parameter="item" :param-path="paramPath"></x-item>
@@ -12,7 +13,9 @@
 <script>
     export default {
         name: "XForm",
-        props:["parameter",'value','paramPath','notRootForm','root'],
+        props:["parameter",'value','paramPath'
+            ,'notRootForm','root','containerProps'
+            ,'record'],
         created(){
             if(!this.notRootForm){
                 this.$set(this,'vRoot',this)
