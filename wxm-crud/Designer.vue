@@ -144,22 +144,59 @@
                 layoutComponents,
                 containerProps:null,
                 value:{
-                    "props": {},
+                    "props": {
+                        "textAlign": ""
+                    },
                     "list": [
                         {
                             "type": "scopeGateway",
                             "name": "作用域网关",
                             "list": [
                                 {
+                                    "type": "input",
+                                    "name": "名称",
+                                    "defaultValue": "",
+                                    "placeholder": "",
+                                    "key": "input_1581240148890_30942",
+                                    "inline": true
+                                },
+                                {
                                     "type": "button",
-                                    "name": "按钮",
+                                    "name": "查询",
                                     "btnType": "primary",
                                     "key": "button_1580896611142_86318",
-                                    "clickHandler": "scopeMessage(\"s1\")"
+                                    "clickHandler": "scopeMessage(\"s1\")",
+                                    "inline": true
                                 }
                             ],
                             "key": "s1",
-                            "props": {}
+                            "props": {
+                                "textAlign": "right;"
+                            }
+                        },
+                        {
+                            "type": "divider",
+                            "name": "",
+                            "orientation": "left",
+                            "dashed": false,
+                            "key": "divider_1581240190909_70993"
+                        },
+                        {
+                            "type": "container",
+                            "name": "容器",
+                            "list": [
+                                {
+                                    "type": "button",
+                                    "name": "新增",
+                                    "btnType": "primary",
+                                    "key": "button_1581240199163_35367",
+                                    "clickHandler": "$rp.[modal_new].visible=true;"
+                                }
+                            ],
+                            "key": "container_1581240236046_9634",
+                            "props": {
+                                "textAlign": "right;"
+                            }
                         },
                         {
                             "type": "table",
@@ -192,7 +229,7 @@
                                             "name": "修改",
                                             "btnType": "",
                                             "key": "a_1581182559067_99492",
-                                            "clickHandler": "$rp.[modal1].visible=true;\n$rv.s2.input_id=:$s.record.id",
+                                            "clickHandler": "$rp.[modal_update].visible=true;\n$rv.scope_update.id=:$s.record.id\n$rv.scope_update.name=:$s.record.name",
                                             "inline": true
                                         },
                                         {
@@ -203,16 +240,9 @@
                                             "inline": true,
                                             "marginLeft": "20px",
                                             "href": "",
-                                            "clickHandler": "result=[-user-info/{$s.record.id}]"
-                                        },
-                                        {
-                                            "type": "a",
-                                            "name": "新增和修改",
-                                            "btnType": "",
-                                            "key": "a_1581230129351_61416",
-                                            "clickHandler": "result=[+user-info,$s.record]\nresult=[>user-info/{$s.record.id},$s.record]",
-                                            "inline": true,
-                                            "marginLeft": "20px"
+                                            "clickHandler": "result=[-user-info/{$s.record.id}]",
+                                            "clickConfirm": true,
+                                            "clickConfirmMsg": "确认要删除这条记录吗？"
                                         }
                                     ],
                                     "title": "name1",
@@ -238,27 +268,54 @@
                                     "list": [
                                         {
                                             "type": "input",
-                                            "name": "输入框",
+                                            "name": "名称",
                                             "defaultValue": "",
                                             "placeholder": "",
-                                            "key": "input_id"
-                                        },
-                                        {
-                                            "type": "input",
-                                            "name": "输入框",
-                                            "defaultValue": "",
-                                            "placeholder": "",
-                                            "key": "input_name"
+                                            "key": "name"
                                         }
                                     ],
-                                    "key": "s2",
+                                    "key": "scope_new",
                                     "props": {}
                                 }
                             ],
                             "visible": false,
-                            "key": "modal1",
+                            "key": "modal_new",
                             "props": {},
-                            "okHandler": "$p.visible=false"
+                            "cancelHandler": "$p.visible=false;\n",
+                            "okHandler": "$s.obj = {}\n$s.obj.name=:$rv.scope_new.name\nresult=[+user-info,$s.obj]\n$p.visible=false;\n"
+                        },
+                        {
+                            "type": "modal",
+                            "name": "新增",
+                            "list": [
+                                {
+                                    "type": "scopeGateway",
+                                    "name": "作用域网关",
+                                    "list": [
+                                        {
+                                            "type": "input",
+                                            "name": "标识",
+                                            "defaultValue": "",
+                                            "placeholder": "",
+                                            "key": "id"
+                                        },
+                                        {
+                                            "type": "input",
+                                            "name": "名称",
+                                            "defaultValue": "",
+                                            "placeholder": "",
+                                            "key": "name"
+                                        }
+                                    ],
+                                    "key": "scope_update",
+                                    "props": {}
+                                }
+                            ],
+                            "visible": false,
+                            "key": "modal_update",
+                            "props": {},
+                            "okHandler": "result=[>user-info/{$rv.scope_update.id},$rv.scope_update]\n$p.visible=false",
+                            "cancelHandler": "$p.visible=false"
                         },
                         {
                             "type": "tabs",

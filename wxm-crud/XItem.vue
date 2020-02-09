@@ -183,27 +183,23 @@ import XRuntime from './XRuntime'
                 if(this.parameter.scopeListeners){
                     this.parameter.scopeListeners.forEach(function(scopeListener){
                         if(scopeListener.scopeName==message.scopeName){
-                            let xRuntime = new XRuntime(scopeListener.handler,me)
-                            xRuntime.validate()
-                            xRuntime.exec({scopeName:message.scopeName})
+                            let xRuntime = new XRuntime(me.root)
+                            xRuntime.exec(me,scopeListener.handler,{scopeName:message.scopeName})
                         }
                     })
                 }
             },
             btnClickHandler(record){
-                let xRuntime = new XRuntime(this.parameter.clickHandler,this,{record:record})
-                xRuntime.validate()
-                xRuntime.exec()
+                let xRuntime = new XRuntime(this.root)
+                xRuntime.exec(this,this.parameter.clickHandler,{record:record})
             },
             okHandler(){
-                let xRuntime = new XRuntime(this.parameter.okHandler,this)
-                xRuntime.validate()
-                xRuntime.exec()
+                let xRuntime = new XRuntime(this.root)
+                xRuntime.exec(this,this.parameter.okHandler)
             },
             cancelHandler(){
-                let xRuntime = new XRuntime(this.parameter.cancelHandler,this)
-                xRuntime.validate()
-                xRuntime.exec()
+                let xRuntime = new XRuntime(this.root)
+                xRuntime.exec(this,this.parameter.cancelHandler)
             }
         }
     }

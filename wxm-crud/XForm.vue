@@ -11,6 +11,7 @@
 </template>
 
 <script>
+    import XRuntime from "./XRuntime";
     export default {
         name: "XForm",
         props:["parameter",'value','paramPath'
@@ -19,11 +20,13 @@
         created(){
             if(!this.notRootForm){
                 this.$set(this,'vRoot',this)
+                this.xRuntime = new XRuntime(this)
             }
         },
         data(){
             return {
-                vRoot:this.root
+                vRoot:this.root,
+                xRuntime:null
             }
         },
         methods:{

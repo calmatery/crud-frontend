@@ -6,67 +6,72 @@ axios.defaults.withCredentials = true
 
 
 class XVariable{
-    constructor(def,xRuntime){
+    constructor(def,xRuntime,xItem,env){
         this.def = def
+        let pathArr = def.split('.')
+        if(pathArr.length>1){
+            this.type = pathArr[0]
+            pathArr.shift()
+            this.pathArr = pathArr
+        }
         this.xRuntime = xRuntime
+        this.xItem= xItem
+        this.env = env
         this.prop = null
     }
     setValue(val){
-        if(this.def.startsWith("$v.")){
-            this.xRuntime.xItem.$set(this.xRuntime.xItem.value,this.def.substr(3),val)
+        if(this.type=="$v"){
+            this.xItem.$set(this.xItem.value,this.pathArr[0],val)
         }
-        else if(this.def.startsWith("$rv.")||this.def.startsWith("$rp.")){
+        else if(this.type=="$rv"||this.type=="$rp"||this.type=="$s"){
             let parentObj = this.getParentObject()
-            this.xRuntime.xItem.$set(parentObj,this.prop,val)
+            this.xItem.$set(parentObj,this.prop,val)
         }
-        else if(this.def.startsWith("$p.")){
-            this.xRuntime.xItem.$set(this.xRuntime.xItem.parameter,this.def.substr(3),val)
+        else if(this.type=="$p"){
+            this.xItem.$set(this.xItem.parameter,this.pathArr[0],val)
         }
-        // else{
-        // }
     }
     getValue(){
-        if(this.def.startsWith("$v.")){
-            return this.xRuntime.xItem.value[this.def.substr(3)]
+        if(this.type=="$v"){
+            return this.xItem.value[this.def.substr(3)]
         }
-        else if(this.def.startsWith("$rv.")||this.def.startsWith("$rp.")){
+        else if(this.type=="$rv"||this.type=="$rp"||this.type=="$s"){
             return this.getParentObject()[this.prop]
         }
-        else if(this.def.startsWith("$p.")){
-            return this.xRuntime.xItem.parameter[this.def.substr(3)]
-        }
-        else if(this.def.startsWith("$s.")){
-            let obj = this.xRuntime.runtimeEnv
-            let pathStr = this.def.substr(3)
-            let pathArr = pathStr.split(".")
-            pathArr.forEach(function(pathItem){
-                obj = obj[pathItem]
-            })
-            return obj
+        else if(this.type=="$p"){
+            return this.xItem.parameter[this.def.substr(3)]
         }
     }
     getParentObject(){
         let obj = null
-        let pathStr = this.def.substr(4)
-        let pathArr = pathStr.split(".")
-        this.prop = pathArr.pop()
-        if(this.def.startsWith("$rv.")){
-            obj = this.xRuntime.xItem.root.value
-            pathArr.forEach(function(pathItem){
+        this.prop = this.pathArr.pop()
+
+        if(this.type=="$s"){
+            let obj = this.env
+            this.pathArr.forEach(function(pathItem){
                 obj = obj[pathItem]
             })
             return obj
         }
-        if(this.def.startsWith("$rp.")){
-            if(pathArr.length>0&&pathArr[0].startsWith('[')&&pathArr[0].endsWith(']')){
-                obj = this.xRuntime.xItem.root
+
+        if(this.type=="$rv"){
+            obj = this.xItem.root.value
+            this.pathArr.forEach(function(pathItem){
+                obj = obj[pathItem]
+            })
+            return obj
+        }
+        if(this.type=="$rp"){
+            if(this.pathArr.length>0&&this.pathArr[0].startsWith('[')&&this.pathArr[0].endsWith(']')){
+                obj = this.xItem.root
             }
             else {
-                obj = this.xRuntime.xItem.root.parameter
+                obj = this.xItem.root.parameter
             }
             let results = []
             results.push(obj)
-            pathArr.forEach(function(pathItem){
+            let me = this
+            this.pathArr.forEach(function(pathItem){
                 if(pathItem.startsWith('[')&&pathItem.endsWith(']')){
                     pathItem = pathItem.substr(1,pathItem.length-2)
                     let tmpResults = []
@@ -80,12 +85,12 @@ class XVariable{
                         }
                     }
                     if(tmpResults.length==0)
-                        throw pathStr+'不存在!'
+                        throw me.def+'不存在!'
                     results = tmpResults
                 }
                 else {
                     if(results&&results.length!=1)
-                        throw pathStr+'存在多个!'
+                        throw  me.def+'存在多个!'
                     if(results&&results.length==1){
                         obj = results[0].parameter
                         results=null
@@ -94,7 +99,7 @@ class XVariable{
                 }
             })
             if(results&&results.length!=1)
-                throw pathStr+'存在多个!'
+                throw me.def+'存在多个!'
             if(results&&results.length==1)
                 obj = results[0].parameter
         }
@@ -120,7 +125,6 @@ class XCommand{
             this.right = arr[1].trim()
             this.isRemote = this.whetherRemote(this.right)
         }
-        this.initRemote()
     }
     whetherRemote(expression){
         return expression.startsWith('[')&&expression.endsWith(']')
@@ -138,7 +142,8 @@ class XCommand{
         }
         this["__"+funName].apply(this,params)
     }
-    exec(){
+    exec(xItem,env){
+        this.initRemote(xItem,env)
         let me = this
         let promise = new Promise(function(resolve,reject){
             if(me.isRemote){
@@ -172,33 +177,29 @@ class XCommand{
                 me.execFun()
             }
             else if(me.isRemote){
-                let xVar = new XVariable(me.left,me.xRuntime)
+                let xVar = new XVariable(me.left,me.xRuntime,xItem,env)
                 xVar.setValue(res.data)
             }
             else {
                 if(me.right.startsWith(':')){
-                    let leftVar = new XVariable(me.left,me.xRuntime)
-                    let rightVar = new XVariable(me.right.substr(1),me.xRuntime)
+                    let leftVar = new XVariable(me.left,me.xRuntime,xItem,env)
+                    let rightVar = new XVariable(me.right.substr(1),me.xRuntime,xItem,env)
                     let rightVal = rightVar.getValue()
                     leftVar.setValue(rightVal)
                 }
                 else {
-                    let xVar = new XVariable(me.left,me.xRuntime)
+                    let xVar = new XVariable(me.left,me.xRuntime,xItem,env)
                     let val = me.getJsonVal(me.right)
                     xVar.setValue(val)
                 }
             }
-            me.nextCommand&&me.nextCommand.exec()
+            me.nextCommand&&me.nextCommand.exec(xItem,env)
         },function(){
         })
     }
-    initRemote(){
+    initRemote(xItem,env){
         if(!this.isRemote)
             return
-        this.initRemoteUrl()
-        this.initRemoteParams()
-    }
-    initRemoteUrl(){
         let url = this.right.substr(1,this.right.length-2)
         let urlArr = url.split(",")
         url = urlArr[0]
@@ -228,17 +229,14 @@ class XCommand{
 
         for (let i = 0; i < urlParts.length; i++) {
             let urlPart = urlParts[i][0]
-            let xVar = new XVariable(urlPart.substr(1,urlPart.length-2),this.xRuntime)
+            let xVar = new XVariable(urlPart.substr(1,urlPart.length-2),this.xRuntime,xItem,env)
             url = url.replace(urlPart,xVar.getValue())
         }
         this.remoteUrl = url
         if(urlArr.length>=2){
-            let xVar = new XVariable(urlArr[1],this.xRuntime)
+            let xVar = new XVariable(urlArr[1],this.xRuntime,xItem,env)
             this.remoteParams = xVar.getValue()
         }
-    }
-    initRemoteParams(){
-
     }
     getJsonVal(val){
         let tmp = JSON.parse('{"t":'+val+'}')
@@ -258,36 +256,45 @@ class XCommand{
 }
 
 export default class{
-    constructor(content,xItem,runtimeEnv){
-        this.content = content
-        this.xItem = xItem
-        this.commands=[]
-        this.root = xItem.root
-        this.runtimeEnv=runtimeEnv||{}
+    rootEnv={}
+    constructor(root){
+        this.root = root
+        this.pageEnv={}
     }
-    validate(me){
-        if(this.content){
-            let commandStrs=this.content.split(/;|\n/)
+    // constructor(content,xItem,runtimeEnv){
+    //     this.content = content
+    //     this.xItem = xItem
+    //     this.commands=[]
+    //     this.root = xItem.root
+    //     this.runtimeEnv=runtimeEnv||{}
+    // }
+    validate(content){
+        let commands = []
+        let me = this
+        if(content){
+            let commandStrs=content.split(/;|\n/)
             commandStrs = commandStrs.filter(function(command){
                 return command&&command.trim()
             })
-            me = this
+
             commandStrs.forEach(function(commandStr){
                 let command =new XCommand(commandStr,me)
-                me.commands.push(command)
+                commands.push(command)
             })
             let tmpCommand = null
-            this.commands.forEach(function(command){
+            commands.forEach(function(command){
                 if(tmpCommand){
                     tmpCommand.nextCommand=command
                 }
                 tmpCommand=command
             })
         }
+        return commands
     }
-    exec(params){
-        if(this.commands.length>0){
-            this.commands[0].exec(params)
+    exec(xItem,content,env){
+        let commands = this.validate(content)
+        if(commands.length>0){
+            commands[0].exec(xItem,env||{})
         }
     }
 
