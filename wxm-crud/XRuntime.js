@@ -1,7 +1,6 @@
 import axios from 'axios'
 axios.defaults.baseURL='http://127.0.0.1:8081/'
 axios.defaults.headers['Content-Type'] = 'application/json;charse=UTF-8'
-axios.defaults.headers.post['Content-Type']=''
 axios.defaults.crossDomain = true
 axios.defaults.withCredentials = true
 
