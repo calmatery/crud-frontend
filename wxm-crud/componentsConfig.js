@@ -1,9 +1,15 @@
 export const basicComponents = [
     {
+        type: 'a',
+        name: '链接',
+        _icon: 'icon-lianjie',
+        btnType:''
+    },
+    {
         type: 'button',
         name: '按钮',
         _icon: 'icon-anniu',
-        btnType:'primary'
+        btnType:''
     },
     {
         type: 'input',

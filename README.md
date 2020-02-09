@@ -39,6 +39,12 @@ a=:b        //赋值变量
 
 a=[users]       //赋值远程变量
 a=[users,scopeMes]      //赋值远程变量带参数????
+
+result=[+users,user]
+result=[-users/{user.id}]
+result=[>users/{user.id},user]
+
+....
 [+users]=scopeMes   //新增
 [-users]=scopeMes   //删除
 [>users]=scopeMes   //修改

@@ -20,8 +20,32 @@
                             <a-input v-model="value.name"></a-input>
                         </a-form-item>
 
-                        <a-form-item v-if="value.type=='button'" label="点击事件">
+                        <a-form-item v-if="value.type=='a'&&!value.clickConfirm" label="链接地址">
+                            <a-textarea v-model="value.href"></a-textarea>
+                        </a-form-item>
+
+                        <a-form-item v-if="['button','a'].indexOf(value.type)>=0" label="确认提示">
+                            <a-checkbox v-model="value.clickConfirm">开启</a-checkbox>
+                        </a-form-item>
+
+                        <a-form-item v-if="value.clickConfirm" label="提示信息">
+                            <a-input v-model="value.clickConfirmMsg"></a-input>
+                        </a-form-item>
+
+                        <a-form-item v-if="['button','a'].indexOf(value.type)>=0" label="点击事件">
                             <a-textarea v-model="value.clickHandler"></a-textarea>
+                        </a-form-item>
+
+
+                        <a-form-item v-if="value.type=='button'" label="按钮类型">
+                            <a-select v-model="value.btnType"
+                                      defaultValue="">
+                                <a-select-option value="primary">主按钮</a-select-option>
+                                <a-select-option value="">次按钮</a-select-option>
+                                <a-select-option value="dashed">虚线按钮</a-select-option>
+                                <a-select-option value="danger">危险按钮</a-select-option>
+                                <a-select-option value="link">链接按钮</a-select-option>
+                            </a-select>
                         </a-form-item>
 
                         <a-form-item v-if="value.type=='modal'" label="确认事件">

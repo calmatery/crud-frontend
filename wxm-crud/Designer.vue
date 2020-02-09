@@ -87,7 +87,7 @@
     import Vue from 'vue';
     import { Icon, Button,Layout,Input,InputNumber,Radio,
         Form,DatePicker,Checkbox,Select,Table,
-        Tabs,Modal,Row,Col,Divider,
+        Tabs,Modal,Row,Col,Divider,Popconfirm,
         message } from 'ant-design-vue';
     import draggable from 'vuedraggable'
     import DesignerPanel from "./DesignerPanel";
@@ -116,6 +116,7 @@
     Vue.component(Row.name, Row);
     Vue.component(Col.name, Col);
     Vue.component(Divider.name, Divider);
+    Vue.component(Popconfirm.name, Popconfirm);
     Vue.component(Form.name, Form);
     Vue.component(Form.Item.name, Form.Item);
     Vue.component(Layout.name, Layout);
@@ -187,19 +188,31 @@
                                     "slot": "slot",
                                     "list": [
                                         {
-                                            "type": "button",
-                                            "name": "按钮",
-                                            "btnType": "primary",
-                                            "key": "button_1581166328834_95830",
-                                            "inline": true,
-                                            "clickHandler": "$rp.[modal1].visible=true;\n$rv.s2.input_id=:$s.record.id"
+                                            "type": "a",
+                                            "name": "修改",
+                                            "btnType": "",
+                                            "key": "a_1581182559067_99492",
+                                            "clickHandler": "$rp.[modal1].visible=true;\n$rv.s2.input_id=:$s.record.id",
+                                            "inline": true
                                         },
                                         {
-                                            "type": "button",
-                                            "name": "按钮",
-                                            "btnType": "primary",
-                                            "key": "button_1581166468506_18057",
-                                            "inline": true
+                                            "type": "a",
+                                            "name": "删除",
+                                            "btnType": "",
+                                            "key": "a_1581215369608_79251",
+                                            "inline": true,
+                                            "marginLeft": "20px",
+                                            "href": "",
+                                            "clickHandler": "result=[-user-info/{$s.record.id}]"
+                                        },
+                                        {
+                                            "type": "a",
+                                            "name": "新增和修改",
+                                            "btnType": "",
+                                            "key": "a_1581230129351_61416",
+                                            "clickHandler": "result=[+user-info,$s.record]\nresult=[>user-info/{$s.record.id},$s.record]",
+                                            "inline": true,
+                                            "marginLeft": "20px"
                                         }
                                     ],
                                     "title": "name1",

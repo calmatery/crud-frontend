@@ -12,8 +12,26 @@
                 </a-form-item>
             </designer-form-item>
         </template>
+
+        <template v-if="parameter.type=='a'">
+            <a-popconfirm v-if="parameter.clickConfirm"
+                          :title="parameter.clickConfirmMsg"
+                          okText="是" cancelText="否"
+                          @confirm="btnClickHandler(record)">
+                <a href="javascript:;">{{parameter.name}}</a>
+            </a-popconfirm>
+            <a v-else @click="btnClickHandler(record)"
+               :href="(parameter.clickHandler||!parameter.href)?'javascript:;':parameter.href">{{parameter.name}}</a>
+        </template>
+
         <template v-if="parameter.type=='button'">
-            <a-button :type="parameter.btnType"
+            <a-popconfirm v-if="parameter.clickConfirm"
+                          :title="parameter.clickConfirmMsg"
+                          okText="是" cancelText="否"
+                          @confirm="btnClickHandler(record)">
+                <a-button :type="parameter.btnType">{{parameter.name}}</a-button>
+            </a-popconfirm>
+            <a-button v-else :type="parameter.btnType"
                       @click="btnClickHandler(record)">{{parameter.name}}</a-button>
         </template>
 
@@ -173,19 +191,19 @@ import XRuntime from './XRuntime'
                 }
             },
             btnClickHandler(record){
-                let xRuntime = new XRuntime(this.parameter.clickHandler,this)
+                let xRuntime = new XRuntime(this.parameter.clickHandler,this,{record:record})
                 xRuntime.validate()
-                xRuntime.exec({record:record})
+                xRuntime.exec()
             },
             okHandler(){
                 let xRuntime = new XRuntime(this.parameter.okHandler,this)
                 xRuntime.validate()
-                xRuntime.exec({})
+                xRuntime.exec()
             },
             cancelHandler(){
                 let xRuntime = new XRuntime(this.parameter.cancelHandler,this)
                 xRuntime.validate()
-                xRuntime.exec({})
+                xRuntime.exec()
             }
         }
     }

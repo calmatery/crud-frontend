@@ -7,9 +7,14 @@
             +(value.marginLeft?'margin-left:'+value.marginLeft+';':'')"
          @click.stop="clickHandler">
         <!--基础字段-->
+        <template v-if="value.type=='a'">
+            <a href="javascript:;">{{value.name}}</a>
+        </template>
+
         <template v-if="value.type=='button'">
                     <a-button :type="value.btnType">{{value.name}}</a-button>
         </template>
+
         <template v-if="value.type=='input'">
             <designer-form-item :value="value">
                 <a-input :placeholder="value.placeholder"
